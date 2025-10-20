@@ -2,3 +2,8 @@ body {
     margin: 0;
     overflow: hidden;
 }
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
