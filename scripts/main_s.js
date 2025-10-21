@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -7,6 +7,8 @@ const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.inner
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg'),
 });
+
+const or_controls = new OrbitControls( camera, renderer.domElement );
 
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -23,13 +25,13 @@ scene.add( cube );
 //Свет
 const sun = new THREE.PointLight(0xffffff);
 sun.position.set(3, 3, 3);
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add( sun, ambientLight );
 
 //Skybox подгрузчик
 function createSkyboxEquirectangular() {
     const loader = new THREE.TextureLoader();
-    loader.load('../images/textures/colorful_space_skybox.png', (texture) => {
+    loader.load('../images/textures/colorful_space_skybox_lower_brightness.png', (texture) => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = texture;
         scene.environment = texture;
@@ -38,8 +40,9 @@ function createSkyboxEquirectangular() {
 
 //Увеличение Цветастости!
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-sun.intensity = 1.0;
-renderer.toneMappingExposure = 1.1;
+sun.intensity = 100.0;
+ambientLight.intensity = 1.2;
+renderer.toneMappingExposure = 0.7;
 
 //3Д объекты
 const scene_Torus_Geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
@@ -81,8 +84,10 @@ function animate() {
   scene_Torus.rotation.x += 0.01;
   scene_Torus.rotation.y += 0.005;
   scene_Torus.rotation.z += 0.01;
-  renderer.render( scene, camera );
 
+  or_controls.update();
+
+  renderer.render( scene, camera );
 }
 
 //Функция, которая обновляет размер окна
