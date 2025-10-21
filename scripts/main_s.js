@@ -23,13 +23,23 @@ scene.add( cube );
 //Свет
 const sun = new THREE.PointLight(0xffffff);
 sun.position.set(3, 3, 3);
-const ambientLight = new THREE.AmbientLight(0xffffff);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
 scene.add( sun, ambientLight );
+
+//Skybox подгрузчик
+function createSkyboxEquirectangular() {
+    const loader = new THREE.TextureLoader();
+    loader.load('../images/textures/colorful_space_skybox.png', (texture) => {
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        scene.background = texture;
+        scene.environment = texture;
+    });
+}
 
 //Увеличение Цветастости!
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-sun.intensity = 10.0;
-renderer.toneMappingExposure = 1.0;
+sun.intensity = 1.0;
+renderer.toneMappingExposure = 1.1;
 
 //3Д объекты
 const scene_Torus_Geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
@@ -50,7 +60,7 @@ const starGeometry = new THREE.SphereGeometry( 0.25, 24, 24 );
 const starMatterial = new THREE.MeshStandardMaterial( { color: 0xffffff,  
                                                         roughness: 0,
                                                         emissive: 0xffffff,
-                                                        emissiveIntensity: 0.8  } );
+                                                        emissiveIntensity: 12  } );
 
 //Звездочка 
 function starMaker() {
@@ -88,4 +98,5 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize, false);
 
 //Онимэйшн луп
+createSkyboxEquirectangular();
 renderer.setAnimationLoop(animate);
