@@ -1,0 +1,25 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+        
+      - name: Copy files to docs
+        run: |
+          cp README.md docs/
+          cp -r assets/ docs/assets/ || true
+          cp -r src/ docs/src/ || true
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './docs'
