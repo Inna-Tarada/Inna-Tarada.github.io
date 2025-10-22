@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -7,8 +8,6 @@ const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.inner
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg'),
 });
-
-const or_controls = new OrbitControls( camera, renderer.domElement );
 
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -45,14 +44,17 @@ ambientLight.intensity = 1.2;
 renderer.toneMappingExposure = 0.7;
 
 //3Д объекты
+/*
 const scene_Torus_Geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
-const scene_Torus_Material = new THREE.MeshStandardMaterial( {color: 0xff6347} );
+const scene_Torus_Material = new THREE.MeshStandardMaterial( {color: 0xffff37} );
 const scene_Torus = new THREE.Mesh( scene_Torus_Geometry, scene_Torus_Material );
 scene.add( scene_Torus );
+*/
 
 //икс, вай, Z позиции
-camera.position.setZ(30);
-camera.position.setX(-3);
+camera.position.set( 0.2, 7, 10 );
+
+//const or_controls = new OrbitControls( camera, renderer.domElement );
 
 //Дебаг
 const lightDebug = new THREE.PointLightHelper( sun );
@@ -79,15 +81,12 @@ function starMaker() {
 //Звездочкииии
 Array(200).fill().forEach(starMaker);
 
-//Анимэйшн Функция
-function animate() {
-  scene_Torus.rotation.x += 0.01;
-  scene_Torus.rotation.y += 0.005;
-  scene_Torus.rotation.z += 0.01;
+function cameraMover() {
+  const t = document.body.getBoundingClientRect().top;
 
-  or_controls.update();
-
-  renderer.render( scene, camera );
+  camera.position.z = t * -0.01;
+  camera.position.x = t * 0.0002;
+  camera.rotation.y = t * -0.0002;
 }
 
 //Функция, которая обновляет размер окна
@@ -99,9 +98,43 @@ function onWindowResize() {
 
 }
 
+createSkyboxEquirectangular();
+
+//Загрузка модельки!
+const GLTFloader = new GLTFLoader();
+GLTFloader.load(
+    '../3D_M/DoricBuilding.glb',
+    function (gltf) {
+        
+        scene.add(gltf.scene);
+        console.log(gltf.scene);
+        
+        if (gltf.animations && gltf.animations.length) {
+        }
+    },
+    function (xhr) {
+        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    function (error) {
+        console.error('Error loading GLB model:', error);
+    }
+);
+
+//Анимэйшн Функция
+function animate() {
+  /*
+  scene_Torus.rotation.x += 0.01;
+  scene_Torus.rotation.y += 0.005;
+  scene_Torus.rotation.z += 0.01;
+  */
+  //or_controls.update();
+
+  renderer.render( scene, camera );
+}
+
 //Если ресайз, то ресайз();
 window.addEventListener('resize', onWindowResize, false);
+document.body.onscroll = cameraMover;
 
 //Онимэйшн луп
-createSkyboxEquirectangular();
 renderer.setAnimationLoop(animate);
