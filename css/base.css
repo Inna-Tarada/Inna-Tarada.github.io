@@ -1,3 +1,4 @@
+/* base.css */
 body {
     margin: 0;
 }
@@ -6,6 +7,13 @@ body {
     position: fixed;
     top: 0;
     left: 0;
+}
+
+:root {
+  --spacing: 20px;
+  font-family: brandon-grotesque, sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 main {
@@ -18,13 +26,13 @@ main {
   padding: 120px 0px;
   
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: repeat(16, 1fr);
 }
 
 header {
     background-color: rgba(0, 0, 0, 0.8);
-    grid-column: 2 / span 5;
-    padding: 1rem;
+    grid-column: 2 / span 6;
+    padding: 0.5rem;
     margin-bottom: var(--spacing);
     word-break: normal;
 }
@@ -33,4 +41,62 @@ header {
     font-size: 2.5rem;
     font-family: 'Courier New', Courier, monospace;
     font-style: oblique;
+}
+
+h1, h2, h3 {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  font-style: normal;
+}
+
+section {
+    grid-column: 2 / 10;
+    padding: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.8);
+    font-size: 1.25rem;
+    line-height: 1.5;
+    margin-bottom: var(--spacing);
+}
+
+
+@media (max-width: 768px) {
+    main {
+        padding: 80px 0px;
+        grid-template-columns: 1fr;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    header {
+        grid-column: 1;
+        margin-bottom: 15px;
+        background-color: rgba(0, 0, 0, 0.485);
+    }
+    
+    .header_text {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+    
+    section {
+        grid-column: 1;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        background-color: rgba(0, 0, 0, 0.485);
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 60px 0px;
+    }
+    
+    .header_text {
+        font-size: 1.2rem;
+    }
+    
+    section {
+        font-size: 0.9rem;
+        padding: 0.8rem;
+    }
 }
