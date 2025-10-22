@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const scene = new THREE.Scene();
@@ -103,7 +103,7 @@ createSkyboxEquirectangular();
 //Загрузка модельки!
 const GLTFloader = new GLTFLoader();
 GLTFloader.load(
-    '../3D_M/DoricBuilding.glb',
+    '../3DM/DoricBuilding.glb',
     function (gltf) {
         
         scene.add(gltf.scene);
