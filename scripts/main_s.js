@@ -129,7 +129,7 @@ scene.add(cube);
 
 //Свет
 const sun = new THREE.PointLight(0xffffff);
-sun.position.set(0, 8, 6);
+sun.position.set(0.2, 10, -5);
 const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(sun, ambientLight);
 
@@ -163,8 +163,8 @@ camera.position.set(0, 7, 0);
 // const or_controls = new OrbitControls(camera, renderer.domElement);
 
 //Дебаг
-//const lightDebug = new THREE.PointLightHelper(sun);
-//scene.add(lightDebug);
+const lightDebug = new THREE.PointLightHelper(sun);
+scene.add(lightDebug);
 
 //Маттериалы для звездочек, вне функции для оптимизации
 const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
