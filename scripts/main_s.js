@@ -164,7 +164,7 @@ camera.position.set(0, 7, 0);
 
 //Дебаг
 //const lightDebug = new THREE.PointLightHelper(sun);
-scene.add(lightDebug);
+//scene.add(lightDebug);
 
 //Маттериалы для звездочек, вне функции для оптимизации
 const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
