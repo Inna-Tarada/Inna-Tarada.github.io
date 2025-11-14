@@ -120,6 +120,88 @@ renderer.setAnimationLoop(animate);
 if (isMobile) {
     renderer.shadowMap.enabled = false;
 }
+
+//Обработка кнопок
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+class ButtonManager {
+    constructor() {
+        this.buttons = new Map(); 
+    }
+    
+    onMouseMove(event) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+    
+    addButton(buttonMesh, callback) {
+        this.buttons.set(buttonMesh, callback);
+    }
+    
+    removeButton(buttonMesh) {
+        this.buttons.delete(buttonMesh);
+    }
+    
+    onClick(event) {
+        this.onMouseMove(event);
+        
+        //Обновляем матрицы мира всех объектов сцены
+        scene.traverse(object => {
+            if (object.isMesh) {
+                object.updateMatrixWorld(true);
+            }
+        });
+        
+        raycaster.setFromCamera(mouse, camera);
+        
+        //Собираем ВСЕ меши из всех кнопок (включая дочерние)
+        const allMeshes = [];
+        this.buttons.forEach((callback, buttonObject) => {
+            //Если объект имеет дочерние меши, добавляем их все
+            buttonObject.traverse((child) => {
+                if (child.isMesh) {
+                    allMeshes.push(child);
+                }
+            });
+        });
+        
+        const intersects = raycaster.intersectObjects(allMeshes);
+        
+        if (intersects.length > 0) {
+            const clickedMesh = intersects[0].object;
+            
+            //Находим родительский объект кнопки
+            let parentObject = clickedMesh;
+            while (parentObject.parent && !this.buttons.has(parentObject)) {
+                parentObject = parentObject.parent;
+            }
+            
+            const callback = this.buttons.get(parentObject);
+            if (callback) {
+                console.log('Button clicked:', parentObject.name);
+                callback();
+            }
+        }
+    }
+}
+
+const buttonManager = new ButtonManager();
+/*
+const button1 = createButtonMesh();
+const button2 = createButtonMesh();
+*/
+
+const buttonGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+const buttonMaterial = new THREE.MeshBasicMaterial( {color:0x00883fff} );
+const buttonMesh = new THREE.Mesh( buttonGeometry, buttonMaterial );
+buttonMesh.position.set( 0, 7, -4 );
+
+buttonManager.addButton(buttonMesh, () => {
+    console.log('Button 1 clicked!');
+});
+scene.add(buttonMesh);
+
 /* Тестовый кубик :3
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -264,18 +346,57 @@ loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame', { x: 0.2, y: 6.9, z: -0.25 }, {
 loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 });
 loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame3', { x: 0, y: 6.9, z: 6 }, { x: 0, y: -0.2, z: 0 });
 */
-async function loadAllModels() {
-    try {
-        const mesh1 = await loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 });
-        const mesh2 = await loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 });
-        const mesh3 = await loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding');
+//Новая загрузка моделек!!
 
+// Глобальные переменные для моделей
+let Building, PhotoFrame1, PhotoFrame2, PhotoFrame3;
+
+//Новая загрузка моделек!!
+async function loadMultipleModels() {
+    try {
+        [Building, PhotoFrame1, PhotoFrame2, PhotoFrame3] = await Promise.all([
+            loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding'),
+            loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 }),
+            loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 }),
+            loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame3', { x: 0, y: 6.9, z: 6 }, { x: 0, y: -0.2, z: 0 })
+        ]);
+        
+        // Теперь все модели загружены и доступны
+        console.log('All models loaded');
+        
+        // Добавляем кнопки после загрузки моделей
+        setupButtons();
+        
     } catch (error) {
         console.error('Error loading models:', error);
     }
 }
 
-loadAllModels();
+function setupButtons() {
+    buttonManager.addButton(Building, () => {
+        console.log('Building clicked!');
+        cameraMover.moveTo(0, 7, 0, 0, 7, -2);
+    });
+    
+    buttonManager.addButton(PhotoFrame1, () => {
+        console.log('PhotoFrame 1 clicked!');
+        cameraMover.moveTo(0, 7, 0, 0, 6, 0);
+    });
+    
+    buttonManager.addButton(PhotoFrame2, () => {
+        console.log('PhotoFrame 2 clicked!');
+        //
+    });
+    
+    buttonManager.addButton(PhotoFrame3, () => {
+        console.log('PhotoFrame 3 clicked!');
+        //
+    });
+}
+
+loadMultipleModels();
+
+
 
 /*МЕГА АНИМАТОР КАМЕРЫ ЗАВАЙБЕННЫЙ :0 !!*/
 /*
@@ -338,69 +459,8 @@ function animate() {
     cameraMover.update();
     renderer.render(scene, camera);
 }
-//Обработка кнопок
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
 
-class ButtonManager {
-    constructor() {
-        this.buttons = new Map(); 
-    }
-    
-    onMouseMove(event) {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    }
-    
-    addButton(buttonMesh, callback) {
-        this.buttons.set(buttonMesh, callback);
-    }
-    
-    removeButton(buttonMesh) {
-        this.buttons.delete(buttonMesh);
-    }
-    
-    onClick(event) {
-        this.onMouseMove(event);
-        
-        //Обновляем матрицы мира всех объектов сцены
-        scene.traverse(object => {
-            if (object.isMesh) {
-                object.updateMatrixWorld(true);
-            }
-        });
-        
-        raycaster.setFromCamera(mouse, camera);
-        const buttonMeshes = Array.from(this.buttons.keys());
-        const intersects = raycaster.intersectObjects(buttonMeshes);
-        
-        if (intersects.length > 0) {
-            const clickedButton = intersects[0].object;
-            const callback = this.buttons.get(clickedButton);
-            if (callback) {
-                callback();
-            }
-        }
-    }
-}
 
-// Использование:
-const buttonManager = new ButtonManager();
-/*
-const button1 = createButtonMesh();
-const button2 = createButtonMesh();
-*/
-
-const buttonGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-const buttonMaterial = new THREE.MeshBasicMaterial( {color:0x00883fff} );
-const buttonMesh = new THREE.Mesh( buttonGeometry, buttonMaterial );
-buttonMesh.position.set( 0, 7, -4 );
-
-buttonManager.addButton(buttonMesh, () => {
-    console.log('Button 1 clicked!');
-});
-
-scene.add(buttonMesh);
 
 //Если ресайз, то ресайз();
 window.addEventListener('resize', onWindowResize, false);
