@@ -187,15 +187,15 @@ function starMaker() {
 
 //Звездочкииии
 Array(isMobile ? 100 : 200).fill().forEach(starMaker);
-
+/* Идея неплохая, но думаю все переделать!!! Маркер: #1
 function cameraMover() {
     const t = document.body.getBoundingClientRect().top;
 
-    camera.position.z = t * -0.01;
-    camera.position.x = t * 0.0002;
-    camera.rotation.y = t * -0.0002;
+    camera.position.z = t * -0.01 * 0.8;
+    camera.position.x = t * 0.0002 * 0.8;
+    camera.rotation.y = t * -0.0002 * 0.8;
 }
-
+*/
 //Функция, которая обновляет размер окна
 function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -214,45 +214,117 @@ GLTFloader.setDRACOLoader(dracoLoader);
 
 //Функция для загрузки моделей
 function loadModel(path, name, position = null, rotation = null, scale = null) {
-    GLTFloader.load(
-        path,
-        function (gltf) {
-            const model = gltf.scene;
+    return new Promise((resolve, reject) => {
+        GLTFloader.load(
+            path,
+            function (gltf) {
+                const model = gltf.scene;
+                model.name = name;
 
-            // Позиция
-            if (position) {
-                model.position.set(position.x, position.y, position.z);
+                //Позиция
+                if (position) {
+                    model.position.set(position.x, position.y, position.z);
+                }
+
+                //Повороты
+                if (rotation) {
+                    model.rotation.set(rotation.x, rotation.y, rotation.z);
+                }
+
+                //Масштаб
+                if (scale) {
+                    model.scale.set(scale.x, scale.y, scale.z);
+                }
+
+                scene.add(model);
+                console.log(`${name} loaded:`, model);
+
+                if (gltf.animations && gltf.animations.length) {
+                    console.log(`${name} has ${gltf.animations.length} animations`);
+                }
+
+                // Возвращаем модель через промис
+                resolve(model);
+            },
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% loaded of ' + name);
+            },
+            function (error) {
+                console.error('Error loading GLB model:', error);
+                reject(error);
             }
-
-            // Повороты
-            if (rotation) {
-                model.rotation.set(rotation.x, rotation.y, rotation.z);
-            }
-
-            // Масштаб
-            if (scale) {
-                model.scale.set(scale.x, scale.y, scale.z);
-            }
-
-            scene.add(model);
-            console.log(`${name} loaded:`, model);
-
-            if (gltf.animations && gltf.animations.length) {
-                console.log(`${name} has ${gltf.animations.length} animations`);
-            }
-        },
-        function (xhr) {
-            console.log((xhr.loaded / xhr.total * 100) + '% loaded of ' + name);
-        },
-        function (error) {
-            console.error('Error loading GLB model:', error);
-        }
-    );
+        );
+    });
 }
 
 //Загрузка моделек!
+/*
 loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding');
 loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 });
+loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 });
+loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame3', { x: 0, y: 6.9, z: 6 }, { x: 0, y: -0.2, z: 0 });
+*/
+async function loadAllModels() {
+    try {
+        const mesh1 = await loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 });
+        const mesh2 = await loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 });
+        const mesh3 = await loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding');
+
+    } catch (error) {
+        console.error('Error loading models:', error);
+    }
+}
+
+loadAllModels();
+
+/*МЕГА АНИМАТОР КАМЕРЫ ЗАВАЙБЕННЫЙ :0 !!*/
+/*
+CameraMover.moveTo(10, 5, 15, 0, 0, 0);
+x, y, z и ротация
+*/
+class CameraMover {
+    constructor(camera, scene) {
+        this.camera = camera;
+        this.scene = scene;
+        this.targetPosition = camera.position.clone();
+        this.targetLookAt = new THREE.Vector3(0, 0, 0);
+        this.speed = 0.05;
+        this.isMoving = false;
+    }
+
+    moveTo(x, y, z, lookAtX = 0, lookAtY = 0, lookAtZ = 0) {
+        this.targetPosition.set(x, y, z);
+        this.targetLookAt.set(lookAtX, lookAtY, lookAtZ);
+        this.isMoving = true;
+    }
+
+    update() {
+        if (!this.isMoving) return;
+
+        const positionDistance = this.camera.position.distanceTo(this.targetPosition);
+        const lookAtDistance = this.camera.getWorldDirection(new THREE.Vector3())
+            .distanceTo(this.targetLookAt.clone().sub(this.camera.position).normalize());
+
+        // Move position
+        this.camera.position.lerp(this.targetPosition, this.speed);
+        
+        // Smooth lookat
+        const currentLookAt = new THREE.Vector3();
+        this.camera.getWorldDirection(currentLookAt);
+        currentLookAt.add(this.camera.position);
+        
+        const smoothedLookAt = currentLookAt.lerp(this.targetLookAt, this.speed);
+        this.camera.lookAt(smoothedLookAt);
+
+        // Stop when close enough
+        if (positionDistance < 0.1 && lookAtDistance < 0.01) {
+            this.isMoving = false;
+        }
+    }
+}
+
+const cameraMover = new CameraMover(camera, scene);
+//cameraMover.moveTo(10, 5, 15, 0, 0, 0);
 
 //Анимэйшн Функция
 function animate() {
@@ -262,13 +334,81 @@ function animate() {
     scene_Torus.rotation.z += 0.01;
     */
     // or_controls.update();
-
+    //requestAnimationFrame(animate);
+    cameraMover.update();
     renderer.render(scene, camera);
 }
+//Обработка кнопок
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+class ButtonManager {
+    constructor() {
+        this.buttons = new Map(); 
+    }
+    
+    onMouseMove(event) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+    
+    addButton(buttonMesh, callback) {
+        this.buttons.set(buttonMesh, callback);
+    }
+    
+    removeButton(buttonMesh) {
+        this.buttons.delete(buttonMesh);
+    }
+    
+    onClick(event) {
+        this.onMouseMove(event);
+        
+        //Обновляем матрицы мира всех объектов сцены
+        scene.traverse(object => {
+            if (object.isMesh) {
+                object.updateMatrixWorld(true);
+            }
+        });
+        
+        raycaster.setFromCamera(mouse, camera);
+        const buttonMeshes = Array.from(this.buttons.keys());
+        const intersects = raycaster.intersectObjects(buttonMeshes);
+        
+        if (intersects.length > 0) {
+            const clickedButton = intersects[0].object;
+            const callback = this.buttons.get(clickedButton);
+            if (callback) {
+                callback();
+            }
+        }
+    }
+}
+
+// Использование:
+const buttonManager = new ButtonManager();
+/*
+const button1 = createButtonMesh();
+const button2 = createButtonMesh();
+*/
+
+const buttonGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+const buttonMaterial = new THREE.MeshBasicMaterial( {color:0x00883fff} );
+const buttonMesh = new THREE.Mesh( buttonGeometry, buttonMaterial );
+buttonMesh.position.set( 0, 7, -4 );
+
+buttonManager.addButton(buttonMesh, () => {
+    console.log('Button 1 clicked!');
+});
+
+scene.add(buttonMesh);
 
 //Если ресайз, то ресайз();
 window.addEventListener('resize', onWindowResize, false);
-document.body.onscroll = cameraMover;
+//Слухачи
+//window.addEventListener('mousemove', onMouseMove, false);
+window.addEventListener('click', (event) => buttonManager.onClick(event), false);
+
+//document.body.onscroll = cameraMover;
 
 //Онимэйшн луп
 renderer.setAnimationLoop(animate);

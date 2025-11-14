@@ -60,6 +60,9 @@ section {
 
 
 @media (max-width: 768px) {
+    :root {
+        --spacing: 100px;
+    }
     main {
         padding: 80px 0px;
         grid-template-columns: 1fr;
