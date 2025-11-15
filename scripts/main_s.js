@@ -97,7 +97,7 @@ loadingManager.onError = function (url) {
     loadingText.style.color = '#ff6b6b';
 };
 
-//Инициализация three
+//Инициализация three сцены и тд :3
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
     isMobile ? 130 : 75,
@@ -146,7 +146,7 @@ class ButtonManager {
     onClick(event) {
         this.onMouseMove(event);
         
-        //Обновляем матрицы мира всех объектов сцены
+        //Обновление матрицы объектов
         scene.traverse(object => {
             if (object.isMesh) {
                 object.updateMatrixWorld(true);
@@ -155,7 +155,7 @@ class ButtonManager {
         
         raycaster.setFromCamera(mouse, camera);
         
-        //Собираем ВСЕ меши из всех кнопок (включая дочерние)
+        //Сборка всех мешей, даже дочерних
         const allMeshes = [];
         this.buttons.forEach((callback, buttonObject) => {
             //Если объект имеет дочерние меши, добавляем их все
@@ -171,7 +171,7 @@ class ButtonManager {
         if (intersects.length > 0) {
             const clickedMesh = intersects[0].object;
             
-            //Находим родительский объект кнопки
+            //Поиск родительского объекта
             let parentObject = clickedMesh;
             while (parentObject.parent && !this.buttons.has(parentObject)) {
                 parentObject = parentObject.parent;
@@ -179,7 +179,6 @@ class ButtonManager {
             
             const callback = this.buttons.get(parentObject);
             if (callback) {
-                console.log('Button clicked:', parentObject.name);
                 callback();
             }
         }
@@ -319,17 +318,11 @@ function loadModel(path, name, position = null, rotation = null, scale = null) {
                 }
 
                 scene.add(model);
-                console.log(`${name} loaded:`, model);
 
-                if (gltf.animations && gltf.animations.length) {
-                    console.log(`${name} has ${gltf.animations.length} animations`);
-                }
-
-                // Возвращаем модель через промис
+                //Возращение через промис
                 resolve(model);
             },
             function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded of ' + name);
             },
             function (error) {
                 console.error('Error loading GLB model:', error);
@@ -356,15 +349,11 @@ async function loadMultipleModels() {
     try {
         [Building, PhotoFrame1, PhotoFrame2, PhotoFrame3] = await Promise.all([
             loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding'),
-            loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 }),
+            loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame1', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 }),
             loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 }),
             loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame3', { x: 0, y: 6.9, z: 6 }, { x: 0, y: -0.2, z: 0 })
         ]);
-        
-        // Теперь все модели загружены и доступны
-        console.log('All models loaded');
-        
-        // Добавляем кнопки после загрузки моделей
+        //Для кнопок-моделей, загрузка кнопочного скрипта
         setupButtons();
         
     } catch (error) {
@@ -398,7 +387,7 @@ loadMultipleModels();
 
 
 
-/*МЕГА АНИМАТОР КАМЕРЫ ЗАВАЙБЕННЫЙ :0 !!*/
+/*МЕГА АНИМАТОР КАМЕРЫ :0 !!*/
 /*
 CameraMover.moveTo(10, 5, 15, 0, 0, 0);
 x, y, z и ротация
@@ -459,8 +448,6 @@ function animate() {
     cameraMover.update();
     renderer.render(scene, camera);
 }
-
-
 
 //Если ресайз, то ресайз();
 window.addEventListener('resize', onWindowResize, false);
