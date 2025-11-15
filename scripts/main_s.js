@@ -224,6 +224,50 @@ function createSkyboxEquirectangular() {
     });
 }
 
+// Загрузка текстур
+const textureLoader = new THREE.TextureLoader(loadingManager);
+
+//Загрузка текстурки
+function loadTexture(path) {
+    return new Promise((resolve, reject) => {
+        textureLoader.load(
+            path,
+            (texture) => {
+                texture.colorSpace = THREE.SRGBColorSpace;
+                resolve(texture);
+            },
+            undefined,
+            (error) => {
+                console.error('Error loading texture:', error);
+                reject(error);
+            }
+        );
+    });
+}
+
+//Применение на фоторамку
+function applyTextureToPhotoFrame(model, texture, targetName = 'Picture') {
+    model.traverse((child) => {
+        if (child.isMesh && child.material) {
+            if (child.name.includes(targetName)) {
+
+                const newMaterial = new THREE.MeshStandardMaterial({
+                    map: texture,
+                    roughness: 0.7,
+                    metalness: 0.1,
+                    transparent: false,
+                });
+                
+                child.material = newMaterial;
+                child.material.needsUpdate = true;
+                console.log(`Текстура применена к объекту: ${child.name}`);
+            } else {
+                console.log(`Пропущен объект: ${child.name}`);
+            }
+        }
+    });
+}
+
 //Увеличение Цветастости!
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 sun.intensity = 100.0;
@@ -241,7 +285,7 @@ scene.add(scene_Torus);
 //икс, вай, Z позиции
 camera.position.set(0, 7, 0);
 
-// const or_controls = new OrbitControls(camera, renderer.domElement);
+//const or_controls = new OrbitControls(camera, renderer.domElement);
 
 //Дебаг
 const lightDebug = new THREE.PointLightHelper(sun);
@@ -339,7 +383,6 @@ loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame', { x: 0.2, y: 6.9, z: -0.25 }, {
 loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 });
 loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame3', { x: 0, y: 6.9, z: 6 }, { x: 0, y: -0.2, z: 0 });
 */
-//Новая загрузка моделек!!
 
 // Глобальные переменные для моделей
 let Building, PhotoFrame1, PhotoFrame2, PhotoFrame3;
@@ -347,15 +390,26 @@ let Building, PhotoFrame1, PhotoFrame2, PhotoFrame3;
 //Новая загрузка моделек!!
 async function loadMultipleModels() {
     try {
-        [Building, PhotoFrame1, PhotoFrame2, PhotoFrame3] = await Promise.all([
+        // Загружаем текстуру (она будет отслеживаться loadingManager)
+        const texture1 = await loadTexture('../images/textures/inna1.png');
+
+        // Загружаем модели (они будут отслеживаться loadingManager)
+        [Building, PhotoFrame1] = await Promise.all([
             loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding'),
-            loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame1', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 }),
-            loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 }),
-            loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame3', { x: 0, y: 6.9, z: 6 }, { x: 0, y: -0.2, z: 0 })
+            loadModel('../3DM/PhotoFrameEmpty.glb', 'PhotoFrame1', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 }),
         ]);
-        //Для кнопок-моделей, загрузка кнопочного скрипта
+        /*
+        PhotoFrame2 = PhotoFrame1.clone();
+        PhotoFrame3 = PhotoFrame1.clone();
+        scene.add(PhotoFrame2);
+        PhotoFrame2.position.set( -0.4, 6.9, -0.25 );
+        PhotoFrame3.position.set(-1.4, 6.9, -0.25 );
+        */
+        //Для кнопок-моделей
         setupButtons();
-        
+
+        applyTextureToPhotoFrame(PhotoFrame1, texture1);
+
     } catch (error) {
         console.error('Error loading models:', error);
     }
@@ -372,20 +426,9 @@ function setupButtons() {
         cameraMover.moveTo(0, 7, 0, 0, 6, 0);
     });
     
-    buttonManager.addButton(PhotoFrame2, () => {
-        console.log('PhotoFrame 2 clicked!');
-        //
-    });
-    
-    buttonManager.addButton(PhotoFrame3, () => {
-        console.log('PhotoFrame 3 clicked!');
-        //
-    });
 }
 
 loadMultipleModels();
-
-
 
 /*МЕГА АНИМАТОР КАМЕРЫ :0 !!*/
 /*
@@ -447,7 +490,7 @@ function animate() {
     //requestAnimationFrame(animate);
     cameraMover.update();
     renderer.render(scene, camera);
-}
+}   
 
 //Если ресайз, то ресайз();
 window.addEventListener('resize', onWindowResize, false);
