@@ -391,7 +391,7 @@ let Building, PhotoFrame1, PhotoFrame2, PhotoFrame3;
 async function loadMultipleModels() {
     try {
         // Загружаем текстуру (она будет отслеживаться loadingManager)
-        const texture1 = await loadTexture('../images/textures/inna1.png');
+        const texture1 = await loadTexture('/images/textures/inna1.png');
 
         // Загружаем модели (они будут отслеживаться loadingManager)
         [Building, PhotoFrame1] = await Promise.all([
