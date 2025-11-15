@@ -415,10 +415,10 @@ class CameraMover {
         const lookAtDistance = this.camera.getWorldDirection(new THREE.Vector3())
             .distanceTo(this.targetLookAt.clone().sub(this.camera.position).normalize());
 
-        // Move position
+        //Изменение позиции
         this.camera.position.lerp(this.targetPosition, this.speed);
         
-        // Smooth lookat
+        //Мягкие движения
         const currentLookAt = new THREE.Vector3();
         this.camera.getWorldDirection(currentLookAt);
         currentLookAt.add(this.camera.position);
@@ -426,7 +426,7 @@ class CameraMover {
         const smoothedLookAt = currentLookAt.lerp(this.targetLookAt, this.speed);
         this.camera.lookAt(smoothedLookAt);
 
-        // Stop when close enough
+        //Остановка, если достаточно близко
         if (positionDistance < 0.1 && lookAtDistance < 0.01) {
             this.isMoving = false;
         }
