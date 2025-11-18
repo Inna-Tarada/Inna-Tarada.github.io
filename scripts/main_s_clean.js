@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
@@ -185,28 +184,8 @@ class ButtonManager {
     }
 }
 
+//Объявление баттон менеджера
 const buttonManager = new ButtonManager();
-/*
-const button1 = createButtonMesh();
-const button2 = createButtonMesh();
-*/
-/* Test button koroche
-const buttonGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-const buttonMaterial = new THREE.MeshBasicMaterial( {color:0x00883fff} );
-const buttonMesh = new THREE.Mesh( buttonGeometry, buttonMaterial );
-buttonMesh.position.set( 0, 7, -4 );
-
-buttonManager.addButton(buttonMesh, () => {
-    console.log('Button 1 clicked!');
-});
-scene.add(buttonMesh);
-*/
-/* Тестовый кубик :3
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-*/
 
 //Свет
 const sun = new THREE.PointLight(0xffffff);
@@ -274,14 +253,6 @@ sun.intensity = 100.0;
 ambientLight.intensity = 1.2;
 renderer.toneMappingExposure = 0.7;
 
-//3Д объекты
-/*
-const scene_Torus_Geometry = new THREE.TorusGeometry(10, 3, 16, 100);
-const scene_Torus_Material = new THREE.MeshStandardMaterial({ color: 0xffff37 });
-const scene_Torus = new THREE.Mesh(scene_Torus_Geometry, scene_Torus_Material);
-scene.add(scene_Torus);
-*/
-
 //икс, вай, Z позиции
 camera.position.set(0, 7, 0);
 
@@ -312,15 +283,7 @@ function starMaker() {
 
 //Звездочкииии
 Array(isMobile ? 100 : 200).fill().forEach(starMaker);
-/* Идея неплохая, но думаю все переделать!!! Маркер: #1
-function cameraMover() {
-    const t = document.body.getBoundingClientRect().top;
 
-    camera.position.z = t * -0.01 * 0.8;
-    camera.position.x = t * 0.0002 * 0.8;
-    camera.rotation.y = t * -0.0002 * 0.8;
-}
-*/
 //Функция, которая обновляет размер окна
 function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -376,24 +339,15 @@ function loadModel(path, name, position = null, rotation = null, scale = null) {
     });
 }
 
-//Загрузка моделек!
-/*
-loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding');
-loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 });
-loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame2', { x: 0.1, y: 6.9, z: 3 }, { x: 0, y: -0.2, z: 0 });
-loadModel('../3DM/PhotoFrame.glb', 'PhotoFrame3', { x: 0, y: 6.9, z: 6 }, { x: 0, y: -0.2, z: 0 });
-*/
-
 // Глобальные переменные для моделей
 let Building, PhotoFrame1, PhotoFrameScreen1, PhotoFrame3;
 
 //Новая загрузка моделек!!
 async function loadMultipleModels() {
     try {
-        // Загружаем текстуру (она будет отслеживаться loadingManager)
-        const texture1 = await loadTexture('../images/textures/inna1.png');
 
-        // Загружаем модели (они будут отслеживаться loadingManager)
+        const inna1 = await loadTexture('../images/textures/inna1.png');
+
         [Building, PhotoFrame1] = await Promise.all([
             loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding'),
             loadModel('../3DM/PhotoFrameEmpty.glb', 'PhotoFrame1', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 }),
@@ -403,17 +357,10 @@ async function loadMultipleModels() {
         PhotoFrameScreen1.position.set( 0, 7, -1 );
         PhotoFrameScreen1.rotation.set( 0, 0, 0 );
         scene.add(PhotoFrameScreen1);
-        /*
-        PhotoFrame2 = PhotoFrame1.clone();
-        PhotoFrame3 = PhotoFrame1.clone();
-        scene.add(PhotoFrame2);
-        PhotoFrame2.position.set( -0.4, 6.9, -0.25 );
-        PhotoFrame3.position.set(-1.4, 6.9, -0.25 );
-        */
-        //Для кнопок-моделей
+
         setupButtons();
 
-        applyTextureToPhotoFrame(PhotoFrame1, texture1);
+        applyTextureToPhotoFrame(PhotoFrame1, inna1);
 
     } catch (error) {
         console.error('Error loading models:', error);
@@ -435,11 +382,6 @@ function setupButtons() {
 
 loadMultipleModels();
 
-/*МЕГА АНИМАТОР КАМЕРЫ :0 !!*/
-/*
-CameraMover.moveTo(10, 5, 15, 0, 0, 0);
-x, y, z и ротация
-*/
 class CameraMover {
     constructor(camera, scene) {
         this.camera = camera;
@@ -482,28 +424,19 @@ class CameraMover {
 }
 
 const cameraMover = new CameraMover(camera, scene);
-//cameraMover.moveTo(10, 5, 15, 0, 0, 0);
 
 //Анимэйшн Функция
 function animate() {
-    /*
-    scene_Torus.rotation.x += 0.01;
-    scene_Torus.rotation.y += 0.005;
-    scene_Torus.rotation.z += 0.01;
-    */
-    // or_controls.update();
-    //requestAnimationFrame(animate);
+
     cameraMover.update();
     renderer.render(scene, camera);
 }   
 
 //Если ресайз, то ресайз();
 window.addEventListener('resize', onWindowResize, false);
-//Слухачи
-//window.addEventListener('mousemove', onMouseMove, false);
-window.addEventListener('click', (event) => buttonManager.onClick(event), false);
 
-//document.body.onscroll = cameraMover;
+//Слухачи
+window.addEventListener('click', (event) => buttonManager.onClick(event), false);
 
 //Онимэйшн луп
 renderer.setAnimationLoop(animate);
