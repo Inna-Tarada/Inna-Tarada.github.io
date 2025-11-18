@@ -97,7 +97,7 @@ class CameraController {
         });
 
         this.cameraAngles.set('screenView', {
-            position: new THREE.Vector3(0, 7, 2),
+            position: new THREE.Vector3(0, 7.3, 20),
             lookAt: new THREE.Vector3(0, 7, -1)
         });
     }
@@ -258,7 +258,7 @@ loadingManager.onError = function (url) {
 //Инициализация сцены+камеры
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
-    isMobile ? 130 : 75,
+    isMobile ? 110 : 75,    
     window.innerWidth / window.innerHeight,
     0.1,
     1000
@@ -405,7 +405,7 @@ async function loadMultipleModels() {
 
         PhotoFrameScreen1 = PhotoFrame1.clone();
         PhotoFrameScreen1.scale.set(7, 4, 1);
-        PhotoFrameScreen1.position.set(0, 7, -1);
+        PhotoFrameScreen1.position.set(0, 7, 19);
         PhotoFrameScreen1.rotation.set(0, 0, 0);
         scene.add(PhotoFrameScreen1);
 
@@ -424,17 +424,17 @@ function setupButtons() {
 
     buttonManager.addButton(Building, () => {
         console.log('Building selected!');
-        cameraController.moveTo( 0, 7, 0, 0, 7, -2, 2000)
+        cameraController.toDefaultView();
     });
 
     buttonManager.addButton(PhotoFrame1, () => {
         console.log('Photo frame selected!');
-        cameraController.moveTo( 0, 7, 0, 0, 5, 0, 2000)
+        cameraController.toScreenView();
     });
 
     buttonManager.addButton(PhotoFrameScreen1, () => {
         console.log('Screen selected!');
-        cameraController.toScreenView();
+        cameraController.toDefaultView();
     });
 
     console.log('Buttons live');
