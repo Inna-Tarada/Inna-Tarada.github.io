@@ -157,6 +157,14 @@ class CameraController {
 //Глобальные переменные
 let Building, PhotoFrame1, PhotoFrameScreen1;
 let cameraController, buttonManager;
+let HitBoxSkills, HitBoxAboutMe;
+
+// ========================= ХитБоксы =========================
+
+const HitBoxMaterial = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0, color: "#FF00FF" } );
+const HitBoxDefaultG = new THREE.BoxGeometry( 2, 0.5, 0.1 );
+HitBoxSkills = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
+HitBoxAboutMe = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
 
 function initSystems(camera, renderer) {
     cameraController = new CameraController(camera, renderer);
@@ -166,6 +174,7 @@ function initSystems(camera, renderer) {
 }
 
 // ========================= Лоадинг менажер =========================
+
 const loadingManager = new THREE.LoadingManager();
 
 const loadingScreen = document.createElement('div');
@@ -264,7 +273,10 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
+scene.add(HitBoxAboutMe, HitBoxSkills);
 camera.position.set( 0, 7, 0 );
+HitBoxAboutMe.position.set( 0, 7.5, 19.05);
+HitBoxSkills.position.set( 0, 7, 19.05)
 
 //Оптимизейшен
 const renderer = new THREE.WebGLRenderer({
@@ -397,6 +409,9 @@ function loadModel(path, name, position = null, rotation = null, scale = null) {
 async function loadMultipleModels() {
     try {
         const inna1 = await loadTexture('../images/textures/inna1.png');
+        const placeholder = await loadTexture('../images/textures/placeholder.png');
+        inna1.repeat.set(2,2);
+        placeholder.repeat.set( 3,3 );
 
         [Building, PhotoFrame1] = await Promise.all([
             loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding'),
@@ -411,6 +426,7 @@ async function loadMultipleModels() {
 
         //Текстуры аплаятсяяяя
         applyTextureToPhotoFrame(PhotoFrame1, inna1);
+        applyTextureToPhotoFrame(PhotoFrameScreen1, placeholder);
 
         setupButtons();
 
@@ -420,6 +436,7 @@ async function loadMultipleModels() {
 }
 
 // ========================= Объявление кнопочек =========================
+
 function setupButtons() {
 
     buttonManager.addButton(Building, () => {
