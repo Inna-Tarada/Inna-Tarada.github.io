@@ -449,20 +449,22 @@ function setupButtons() {
     });
 
     buttonManager.addButton(PhotoFrame1, () => {
-        console.log('Photo frame selected!');
+        console.log('Photo frame is clicked!');
         cameraController.toScreenView();
     });
 
     buttonManager.addButton(PhotoFrameScreen1, () => {
-        console.log('Screen selected!');
+        console.log('Screen is clicked!');
         cameraController.toDefaultView();
     });
 
     buttonManager.addButton(HitBoxAboutMe, () => {
+        cameraController.moveTo( 30, 30, 30, 0, 0, 0, 3800);
         console.log('AboutMe is clicked!');
     });
 
     buttonManager.addButton(HitBoxSkills, () => {
+        cameraController.moveTo( -30, -30, -30, 0, 0, 0, 3800);
         console.log('SkillBox is clicked!');
     });
 
