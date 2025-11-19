@@ -454,6 +454,14 @@ function setupButtons() {
         cameraController.toDefaultView();
     });
 
+    buttonManager.addButton(HitBoxAboutMe, () => {
+        console.log('AboutMe is clicked!');
+    });
+
+    buttonManager.addButton(HitBoxSkills, () => {
+        console.log('SkillBox is clicked!');
+    });
+
     console.log('Buttons live');
 }
 
