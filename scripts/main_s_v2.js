@@ -409,9 +409,13 @@ function loadModel(path, name, position = null, rotation = null, scale = null) {
 async function loadMultipleModels() {
     try {
         const inna1 = await loadTexture('../images/textures/inna1.png');
-        const placeholder = await loadTexture('../images/textures/placeholder.png');
-        inna1.repeat.set(2,2);
+        const placeholder = await loadTexture('../images/textures/ScreenMenu.png');
+        /*
+        inna1.wrapS = THREE.RepeatWrapping;
+        inna1.wrapT = THREE.RepeatWrapping;
+        inna1.repeat.set( 3, 3 );
         placeholder.repeat.set( 3,3 );
+        */
 
         [Building, PhotoFrame1] = await Promise.all([
             loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding'),
