@@ -487,4 +487,4 @@ window.addEventListener('resize', onWindowResize, false);
 window.addEventListener('click', (event) => buttonManager.onClick(event), false);
 
 //Онимейшн луууп
-renderer.setAnimationLoop(animate);
+renderer.setAnimationLoop(animate); //
