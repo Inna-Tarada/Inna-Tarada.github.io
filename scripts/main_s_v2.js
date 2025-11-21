@@ -4,6 +4,122 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+// ========================= Динамическое разрешение =========================
+class DynamicResolution {
+    constructor(renderer, targetFPS = 60) {
+        this.renderer = renderer;
+        this.targetFPS = targetFPS;
+        this.currentScale = 1;
+        this.frames = [];
+        this.lastTime = performance.now();
+        this.updateInterval = 300;
+        this.lastUpdateTime = 0;
+    }
+    
+    update() {
+        const currentTime = performance.now();
+        const delta = currentTime - this.lastTime;
+        
+        if (delta > 0) {
+            const fps = 1000 / delta;
+            this.frames.push(fps);
+            if (this.frames.length > 30) this.frames.shift();
+        }
+        
+        this.lastTime = currentTime;
+        
+        if (currentTime - this.lastUpdateTime > this.updateInterval && this.frames.length > 10) {
+            this.adjustQuality();
+            this.lastUpdateTime = currentTime;
+        }
+    }
+    
+    adjustQuality() {
+        const avgFPS = this.frames.reduce((a, b) => a + b) / this.frames.length;
+        let newScale = this.currentScale;
+        
+        if (avgFPS < this.targetFPS - 10) {
+            newScale = Math.max(0.5, this.currentScale - 0.1);
+        } else if (avgFPS > this.targetFPS + 15 && this.currentScale < 1) {
+            newScale = Math.min(1, this.currentScale + 0.05);
+        }
+        
+        if (newScale !== this.currentScale) {
+            this.currentScale = newScale;
+            this.applyResolutionScale();
+        }
+    }
+    
+    applyResolutionScale() {
+        const pixelRatio = Math.min(window.devicePixelRatio * this.currentScale, isMobile ? 1.5 : 2);
+        this.renderer.setPixelRatio(pixelRatio);
+        console.log(`Dynamic resolution: scale ${this.currentScale.toFixed(2)}, pixelRatio ${pixelRatio.toFixed(2)}`);
+    }
+    
+    forceResolutionUpdate() {
+        this.applyResolutionScale();
+    }
+}
+
+// ========================= Менеджер ресайза =========================
+class ResizeManager {
+    constructor(camera, renderer, dynamicResolution) {
+        this.camera = camera;
+        this.renderer = renderer;
+        this.dynamicResolution = dynamicResolution;
+        this.resizeTimeout = null;
+        this.resizeDelay = 250; //ms
+    }
+    
+    onWindowResize = () => {
+        //Дебаунс чтобы избежать частых обновлений
+        if (this.resizeTimeout) {
+            clearTimeout(this.resizeTimeout);
+        }
+        
+        this.resizeTimeout = setTimeout(() => {
+            this.handleResize();
+        }, this.resizeDelay);
+    }
+    
+    handleResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        
+        console.log(`Resizing to: ${width}x${height}`);
+        
+        try {
+            //Камера
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+            
+            //Рендерер
+            this.renderer.setSize(width, height, false);
+            
+            //Динамическое разрешение
+            this.dynamicResolution.applyResolutionScale();
+            this.camera.updateMatrixWorld();
+            
+            console.log(`Resize complete. Pixel ratio: ${this.renderer.getPixelRatio().toFixed(2)}`);
+            
+        } catch (error) {
+            console.error('Resize error:', error);
+        }
+    }
+    
+    //Принудительный ресайз
+    forceResize() {
+        this.handleResize();
+    }
+    
+    destroy() {
+        if (this.resizeTimeout) {
+            clearTimeout(this.resizeTimeout);
+        }
+        window.removeEventListener('resize', this.onWindowResize);
+    }
+}
+
 // ========================= Менеджер кнопочек =========================
 class ButtonManager {
     constructor() {
@@ -26,7 +142,7 @@ class ButtonManager {
     onClick(event) {
         this.onMouseMove(event);
         
-        // Обновление матрицы объектов
+        //Обновление матрицы объектов
         scene.traverse(object => {
             if (object.isMesh) {
                 object.updateMatrixWorld(true);
@@ -35,7 +151,7 @@ class ButtonManager {
         
         raycaster.setFromCamera(mouse, camera);
         
-        // Сборка всех мешей, даже дочерних
+        //Сборка всех мешей, даже дочерних
         const allMeshes = [];
         this.buttons.forEach((callback, buttonObject) => {
             //Если объект имеет дочерние меши, добавляем их все
@@ -140,7 +256,7 @@ class CameraController {
         this.camera.lookAt(smoothedLookAt);
 
         //Остановка, если достаточно близко
-        if (positionDistance < 0.1 && lookAtDistance < 0.01) {
+        if (positionDistance < 0.005 && lookAtDistance < 0.01) {
             this.isMoving = false;
         }
     }
@@ -152,12 +268,13 @@ class CameraController {
     toScreenView() { return this.moveToAngle('screenView'); }
 }
 
-// ========================= Инициализация =========================
+// ========================= Глобальные переменные =========================
 
 //Глобальные переменные
-let Building, PhotoFrame1, PhotoFrameScreen1;
-let cameraController, buttonManager;
+let Building, PhotoFrame1, PhotoFrameScreen1, PFAboutMe;
+let cameraController, buttonManager, resizeManager;
 let HitBoxSkills, HitBoxAboutMe;
+let dynamicResolution, materialOptimizer;
 
 // ========================= ХитБоксы =========================
 
@@ -166,11 +283,17 @@ const HitBoxDefaultG = new THREE.BoxGeometry( 2, 0.5, 0.1 );
 HitBoxSkills = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
 HitBoxAboutMe = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
 
+// ========================= Инициализация =========================
+
 function initSystems(camera, renderer) {
     cameraController = new CameraController(camera, renderer);
     buttonManager = new ButtonManager();
+    dynamicResolution = new DynamicResolution(renderer, isMobile ? 50 : 60);
+    resizeManager = new ResizeManager(camera, renderer, dynamicResolution);
+
+    console.log('Optimization systems loaded. Mobile:', isMobile);
     
-    return { cameraController, buttonManager };
+    return { cameraController, buttonManager, dynamicResolution, resizeManager };
 }
 
 // ========================= Лоадинг менажер =========================
@@ -267,7 +390,7 @@ loadingManager.onError = function (url) {
 //Инициализация сцены+камеры
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
-    isMobile ? 110 : 75,    
+    isMobile ? 120 : 75,    
     window.innerWidth / window.innerHeight,
     0.1,
     1000
@@ -284,6 +407,8 @@ const renderer = new THREE.WebGLRenderer({
     antialias: !isMobile,
     powerPreference: isMobile ? "low-power" : "high-performance"
 });
+
+dynamicResolution = new DynamicResolution(renderer, isMobile ? 50 : 60);
 
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -319,6 +444,11 @@ function loadTexture(path) {
             path,
             (texture) => {
                 texture.colorSpace = THREE.SRGBColorSpace;
+
+                if (isMobile) {
+                    texture.generateMipmaps = true;
+                    texture.minFilter = THREE.LinearMipmapLinearFilter;
+                }
                 resolve(texture);
             },
             undefined,
@@ -419,14 +549,17 @@ async function loadMultipleModels() {
 
         [Building, PhotoFrame1] = await Promise.all([
             loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding'),
-            loadModel('../3DM/PhotoFrameEmpty.glb', 'PhotoFrame1', { x: 0.2, y: 6.9, z: -0.25 }, { x: 0, y: -0.2, z: 0 }),
+            loadModel('../3DM/PhotoFrameEmpty.glb', 'PhotoFrame1', { x: 0.005, y: 6.9, z: -0.25 }, { x: 0, y: 0, z: 0 }),
         ]);
 
         PhotoFrameScreen1 = PhotoFrame1.clone();
         PhotoFrameScreen1.scale.set(7, 4, 1);
         PhotoFrameScreen1.position.set(0, 7, 19);
         PhotoFrameScreen1.rotation.set(0, 0, 0);
-        scene.add(PhotoFrameScreen1);
+        PFAboutMe = PhotoFrameScreen1.clone();
+        PFAboutMe.position.set(-30, 6.5, -29);
+        PFAboutMe.rotation.set(0, 3.14, 0);
+        scene.add(PhotoFrameScreen1, PFAboutMe);
 
         //Текстуры аплаятсяяяя
         applyTextureToPhotoFrame(PhotoFrame1, inna1);
@@ -464,33 +597,41 @@ function setupButtons() {
     });
 
     buttonManager.addButton(HitBoxSkills, () => {
-        cameraController.moveTo( -30, -30, -30, 0, 0, 0, 3800);
+        cameraController.moveTo( -30, 7, -30, -30, 7, -29, 3800);
         console.log('SkillBox is clicked!');
     });
 
     console.log('Buttons live');
 }
 
-//РесайззZZ
-function onWindowResize() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-}
-
 //Онимейшн
+let lastTime = performance.now();
+
 function animate() {
+    const currentTime = performance.now();
+    const delta = currentTime - lastTime;
+
+    dynamicResolution.update();
+    
     cameraController.update();
     renderer.render(scene, camera);
+    
+    lastTime = currentTime;
 }
 
 //Инициализайшен
 createSkyboxEquirectangular();
 loadMultipleModels();
 
-//Слухачи
-window.addEventListener('resize', onWindowResize, false);
+//Слухачи - теперь используем ResizeManager вместо прямой функции
+window.addEventListener('resize', resizeManager.onWindowResize, false);
 window.addEventListener('click', (event) => buttonManager.onClick(event), false);
 
+resizeManager.forceResize();
+
 //Онимейшн луууп
-renderer.setAnimationLoop(animate); //
+renderer.setAnimationLoop(animate);
+window.optimizationSystems = {
+    dynamicResolution,
+    resizeManager
+};
