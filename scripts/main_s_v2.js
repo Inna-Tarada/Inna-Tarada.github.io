@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+//import { FunctionDeclaration } from 'three/examples/jsm/transpiler/AST.js';
+//import { createElement } from 'react';
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -68,7 +70,7 @@ class ResizeManager {
         this.renderer = renderer;
         this.dynamicResolution = dynamicResolution;
         this.resizeTimeout = null;
-        this.resizeDelay = 250; //ms
+        this.resizeDelay = 100; //ms
     }
     
     onWindowResize = () => {
@@ -487,7 +489,7 @@ ambientLight.intensity = 1.2;
 renderer.toneMappingExposure = 0.7;
 
 //Звездашки :3
-const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
+const starGeometry = new THREE.SphereGeometry(0.1, 24, 24);
 const starMatterial = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     roughness: 0,
@@ -579,6 +581,7 @@ function setupButtons() {
     buttonManager.addButton(Building, () => {
         console.log('Building selected!');
         cameraController.toDefaultView();
+        aboutMeHTMLRem();
     });
 
     buttonManager.addButton(PhotoFrame1, () => {
@@ -593,6 +596,7 @@ function setupButtons() {
 
     buttonManager.addButton(HitBoxAboutMe, () => {
         cameraController.moveTo( 30, 30, 30, 0, 0, 0, 3800);
+        aboutMeHTML();
         console.log('AboutMe is clicked!');
     });
 
@@ -602,6 +606,49 @@ function setupButtons() {
     });
 
     console.log('Buttons live');
+}
+
+function aboutMeHTMLRem() {
+    setTimeout(() => {
+        const contentBox = document.getElementById('contentBox');
+        contentBox.style.display = 'none';
+        contentBox.remove();
+    }, 100);
+    
+
+}
+async function aboutMeHTML() {
+    try {
+        const response = await fetch('../text_files/Something');
+        if (!response.ok) {
+            throw new Error('File not found');
+        }
+        const data = await response.text();
+        const cleanData = data.split('//# sourceMappingURL=')[0];
+
+        const contentBox = document.createElement('main');
+        contentBox.setAttribute('id', 'contentBox');
+        const header = document.createElement('header');
+        const headerText = document.createElement('p');
+        const contentSection = document.createElement('section');
+        const contentSectionTextSomething = document.createElement('h1');
+
+        headerText.className = 'header_text';
+        contentSectionTextSomething.className = 'ContentSectionText';
+        
+        headerText.textContent = "Обо мне!";
+        contentSectionTextSomething.textContent = cleanData;
+        console.log(data);
+
+        contentBox.appendChild(header);
+        contentBox.appendChild(contentSection);
+        contentSection.appendChild(contentSectionTextSomething);
+        header.appendChild(headerText);
+        document.body.appendChild(contentBox);
+        
+    } catch (err) {
+        console.error('Error reading file:', err);
+    }
 }
 
 //Онимейшн
