@@ -581,33 +581,52 @@ function setupButtons() {
     buttonManager.addButton(Building, () => {
         console.log('Building selected!');
         cameraController.toDefaultView();
-        aboutMeHTMLRem();
+        HTMLRemove();
     });
 
     buttonManager.addButton(PhotoFrame1, () => {
         console.log('Photo frame is clicked!');
         cameraController.toScreenView();
+        HTMLRemove();
     });
 
     buttonManager.addButton(PhotoFrameScreen1, () => {
         console.log('Screen is clicked!');
         cameraController.toDefaultView();
+        HTMLRemove();
     });
 
     buttonManager.addButton(HitBoxAboutMe, () => {
         cameraController.moveTo( 30, 30, 30, 0, 0, 0, 3800);
-        aboutMeHTML();
         console.log('AboutMe is clicked!');
+        HTMLRemove();
+        HTMLAppear('aboutMe');
     });
 
     buttonManager.addButton(HitBoxSkills, () => {
         cameraController.moveTo( -30, 7, -30, -30, 7, -29, 3800);
         console.log('SkillBox is clicked!');
+        HTMLRemove();
+        HTMLAppear('skills');
     });
 
     console.log('Buttons live');
 }
 
+function HTMLRemove() {
+    const aboutMeMain = document.getElementById('aboutMe');
+    const skillsMain = document.getElementById('skills');
+
+    aboutMeMain.style.visibility = 'hidden';
+    skillsMain.style.visibility = 'hidden';
+}
+
+function HTMLAppear( id ) {
+    const element = document.getElementById(id);
+    element.style.visibility = 'visible';
+}
+
+/*
 function aboutMeHTMLRem() {
     setTimeout(() => {
         const contentBox = document.getElementById('contentBox');
@@ -650,7 +669,7 @@ async function aboutMeHTML() {
         console.error('Error reading file:', err);
     }
 }
-
+*/
 //Онимейшн
 let lastTime = performance.now();
 

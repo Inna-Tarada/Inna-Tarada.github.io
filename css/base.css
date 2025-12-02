@@ -17,6 +17,7 @@ body {
 }
 
 main {
+  visibility: hidden;
   width: 100vw;
   color: white;
   z-index: 99;
@@ -24,12 +25,12 @@ main {
   width: 100%;
   margin: 0px auto;
   padding: 120px 0px;
-  transition:  0.5s ease;
   display: grid;
   grid-template-columns: repeat(16, 1fr);
 }
 
 header {
+    font-weight: bold;
     background-color: rgba(0, 0, 0, 0.8);
     grid-column: 2 / span 6;
     padding: 0.5rem;
@@ -97,7 +98,7 @@ section {
     }
     
     .header_text {
-        font-size: 1.2rem;
+        font-size: 200%;
     }
     
     section {
