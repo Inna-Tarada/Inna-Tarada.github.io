@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-//import { FunctionDeclaration } from 'three/examples/jsm/transpiler/AST.js';
-//import { createElement } from 'react';
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -270,36 +268,154 @@ class CameraController {
     toScreenView() { return this.moveToAngle('screenView'); }
 }
 
-// ========================= Глобальные переменные =========================
+// ========================= Анимация полета крч =========================
+class FloatingAnimation {
+    constructor() {
+        this.enabled = true;
+        this.amplitude = isMobile ? 0.025 : 0.04;
+        this.rotationAmplitude = isMobile ? 0.005 : 0.01;
+        this.speed = 1;
+        this.excludedNames = ['star', 'HitBox', 'light', 'camera', 'Picture'];
+        
+        this.animatedObjects = new Map();
+        this.startTime = performance.now() / 1000;
+        this.animationFrame = null;
+        
+        console.log('Floating Animation System initialized');
+    }
 
-//Глобальные переменные
-let Building, PhotoFrame1, PhotoFrameScreen1, PFAboutMe;
+    shouldExclude(obj) {
+        if (!obj || !obj.name) return false;
+        return this.excludedNames.some(pattern => 
+            obj.name.toLowerCase().includes(pattern.toLowerCase())
+        );
+    }
+
+    scanScene() {
+        if (!window.scene) return;
+        
+        console.log('Scanning scene for floating animation...');
+        this.animatedObjects.clear();
+        
+        window.scene.children.forEach(child => {
+            this.prepareRootObject(child);
+        });
+
+        console.log(`Floating animation: ${this.animatedObjects.size} root objects registered`);
+    }
+
+    prepareRootObject(obj) {
+        if (!obj || !obj.isObject3D) return;
+
+        if (obj.isLight || obj.isCamera || this.shouldExclude(obj)) {
+            return;
+        }
+
+        let hasMeshes = false;
+        obj.traverse(child => {
+            if (child.isMesh) hasMeshes = true;
+        });
+
+        if (hasMeshes && !this.animatedObjects.has(obj)) {
+            this.animatedObjects.set(obj, {
+                originalY: obj.position.y,
+                originalRotX: obj.rotation.x,
+                originalRotY: obj.rotation.y,
+                originalRotZ: obj.rotation.z,
+                offset: Math.random() * Math.PI * 2,
+            });
+            console.log(`Added root object: ${obj.name || 'unnamed'}`);
+        }
+    }
+
+    start() {
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+        }
+        
+        this.startTime = performance.now() / 1000;
+        this.animate();
+        console.log('Floating animation started');
+    }
+
+    stop() {
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+            this.animationFrame = null;
+        }
+        
+        this.animatedObjects.forEach((data, obj) => {
+            if (obj && obj.position) {
+                obj.position.y = data.originalY;
+                obj.rotation.x = data.originalRotX;
+                obj.rotation.y = data.originalRotY;
+                obj.rotation.z = data.originalRotZ;
+            }
+        });
+    }
+
+    animate = () => {
+        if (!this.enabled) return;
+
+        const time = (performance.now() / 1000 - this.startTime) * this.speed;
+        
+        this.animatedObjects.forEach((data, obj) => {
+            if (!obj || !obj.position) return;
+
+            try {
+                const floatY = Math.sin(time + data.offset) * this.amplitude;
+                obj.position.y = data.originalY + floatY;
+
+                if (obj.rotation && this.rotationAmplitude > 0) {
+                    obj.rotation.y = data.originalRotY + Math.sin(time * 0.3 + data.offset) * this.rotationAmplitude;
+                }
+            } catch (e) {
+                this.animatedObjects.delete(obj);
+            }
+        });
+
+        this.animationFrame = requestAnimationFrame(this.animate);
+    }
+
+    addObject(obj) {
+        this.prepareRootObject(obj);
+    }
+
+    removeObject(obj) {
+        this.animatedObjects.delete(obj);
+    }
+}
+
+// ========================= Глобальные переменные =========================
+let Building, PhotoFrame1, PhotoFrameScreen1;
 let cameraController, buttonManager, resizeManager;
-let HitBoxSkills, HitBoxAboutMe;
-let dynamicResolution, materialOptimizer;
+let HitBoxSkills, HitBoxAboutMe, HitBoxBio, HitBoxFilmography, HitBoxCertificates;
+let dynamicResolution, floatingAnimation;
 
 // ========================= ХитБоксы =========================
-
 const HitBoxMaterial = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0, color: "#FF00FF" } );
-const HitBoxDefaultG = new THREE.BoxGeometry( 2, 0.5, 0.1 );
+const HitBoxDefaultG = new THREE.BoxGeometry( 2, 0.23, 0.1 );
+
 HitBoxSkills = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
 HitBoxAboutMe = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
+HitBoxBio = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
+HitBoxFilmography = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
+HitBoxCertificates = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
 
 // ========================= Инициализация =========================
-
 function initSystems(camera, renderer) {
     cameraController = new CameraController(camera, renderer);
     buttonManager = new ButtonManager();
     dynamicResolution = new DynamicResolution(renderer, isMobile ? 50 : 60);
     resizeManager = new ResizeManager(camera, renderer, dynamicResolution);
+    floatingAnimation = new FloatingAnimation();
 
     console.log('Optimization systems loaded. Mobile:', isMobile);
     
-    return { cameraController, buttonManager, dynamicResolution, resizeManager };
+    return { cameraController, buttonManager, dynamicResolution, resizeManager, floatingAnimation };
 }
 
 // ========================= Лоадинг менажер =========================
-
 const loadingManager = new THREE.LoadingManager();
 
 const loadingScreen = document.createElement('div');
@@ -391,6 +507,8 @@ loadingManager.onError = function (url) {
 
 //Инициализация сцены+камеры
 const scene = new THREE.Scene();
+window.scene = scene;
+
 const camera = new THREE.PerspectiveCamera(
     isMobile ? 120 : 75,    
     window.innerWidth / window.innerHeight,
@@ -398,12 +516,23 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-scene.add(HitBoxAboutMe, HitBoxSkills);
+scene.add(HitBoxAboutMe, HitBoxSkills, HitBoxBio, HitBoxCertificates, HitBoxFilmography);
 camera.position.set( 0, 7, 0 );
-HitBoxAboutMe.position.set( 0, 7.5, 19.05);
-HitBoxSkills.position.set( 0, 7, 19.05)
 
-//Оптимизейшен
+HitBoxAboutMe.position.set( 10, 10, 10);
+HitBoxSkills.position.set( 10, 10, 10);
+
+if (isMobile == true) {
+    HitBoxBio.position.set( 0.005, 7.8, -1 );
+    HitBoxFilmography.position.set( 0.005, 7.5, -1 );
+    HitBoxCertificates.position.set( 0.005, 7.2, -1 );
+}
+else {
+    HitBoxBio.position.set( 0.005, 7.6, -1.4 );
+    HitBoxFilmography.position.set( 0.005, 7.3, -1.4 );
+    HitBoxCertificates.position.set( 0.005, 7, -1.4 );
+}
+
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg'),
     antialias: !isMobile,
@@ -415,7 +544,6 @@ dynamicResolution = new DynamicResolution(renderer, isMobile ? 50 : 60);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-// Raycaster для старой системы кнопок
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -500,6 +628,7 @@ const starMatterial = new THREE.MeshStandardMaterial({
 //Звездашки макер :33
 function starMaker() {
     const star = new THREE.Mesh(starGeometry, starMatterial);
+    star.name = 'star_' + Math.random();
     const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(100));
     star.position.set(x, y, z);
     scene.add(star);
@@ -508,7 +637,6 @@ function starMaker() {
 Array(isMobile ? 100 : 200).fill().forEach(starMaker);
 
 // ========================= Лоадинг моделей =========================
-
 const dracoLoader = new DRACOLoader(loadingManager);
 dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 const GLTFloader = new GLTFLoader(loadingManager);
@@ -541,33 +669,39 @@ function loadModel(path, name, position = null, rotation = null, scale = null) {
 async function loadMultipleModels() {
     try {
         const inna1 = await loadTexture('../images/textures/inna1.png');
-        const placeholder = await loadTexture('../images/textures/ScreenMenu.png');
-        /*
-        inna1.wrapS = THREE.RepeatWrapping;
-        inna1.wrapT = THREE.RepeatWrapping;
-        inna1.repeat.set( 3, 3 );
-        placeholder.repeat.set( 3,3 );
-        */
+        const screenMenu = await loadTexture('../images/textures/ScreenMenu.png');
 
         [Building, PhotoFrame1] = await Promise.all([
             loadModel('../3DM/DoricBuilding.glb', 'DoricBuilding'),
             loadModel('../3DM/PhotoFrameEmpty.glb', 'PhotoFrame1', { x: 0.005, y: 6.9, z: -0.25 }, { x: 0, y: 0, z: 0 }),
         ]);
-
+        
+        PhotoFrame1.position.set( 9, 9, 9 );
         PhotoFrameScreen1 = PhotoFrame1.clone();
-        PhotoFrameScreen1.scale.set(7, 4, 1);
-        PhotoFrameScreen1.position.set(0, 7, 19);
+        PhotoFrameScreen1.name = 'ScreenFrame';
+        PhotoFrameScreen1.scale.set( 9, 8, 1 );
+        
+        if (isMobile == true) {
+            PhotoFrameScreen1.position.set( 0.005, 6.6, -1 );
+        }
+        else {
+            PhotoFrameScreen1.position.set( 0.005, 6.4, -1.4 );
+        }
         PhotoFrameScreen1.rotation.set(0, 0, 0);
-        PFAboutMe = PhotoFrameScreen1.clone();
-        PFAboutMe.position.set(-30, 6.5, -29);
-        PFAboutMe.rotation.set(0, 3.14, 0);
-        scene.add(PhotoFrameScreen1, PFAboutMe);
-
-        //Текстуры аплаятсяяяя
+        
+        scene.add(PhotoFrameScreen1);
+        
         applyTextureToPhotoFrame(PhotoFrame1, inna1);
-        applyTextureToPhotoFrame(PhotoFrameScreen1, placeholder);
+        applyTextureToPhotoFrame(PhotoFrameScreen1, screenMenu);
 
         setupButtons();
+
+        setTimeout(() => {
+            if (floatingAnimation) {
+                floatingAnimation.scanScene();
+                floatingAnimation.start();
+            }
+        }, 1000);
 
     } catch (error) {
         console.error('Error loading models:', error);
@@ -575,9 +709,7 @@ async function loadMultipleModels() {
 }
 
 // ========================= Объявление кнопочек =========================
-
 function setupButtons() {
-
     buttonManager.addButton(Building, () => {
         console.log('Building selected!');
         cameraController.toDefaultView();
@@ -596,80 +728,60 @@ function setupButtons() {
         HTMLRemove();
     });
 
-    buttonManager.addButton(HitBoxAboutMe, () => {
+    buttonManager.addButton(HitBoxBio, () => {
         cameraController.moveTo( 30, 30, 30, 0, 0, 0, 3800);
-        console.log('AboutMe is clicked!');
+        console.log('Bio is clicked!');
         HTMLRemove();
-        HTMLAppear('aboutMe');
+        HTMLAppear('bio');
     });
 
-    buttonManager.addButton(HitBoxSkills, () => {
-        cameraController.moveTo( -30, 7, -30, -30, 7, -29, 3800);
-        console.log('SkillBox is clicked!');
+    buttonManager.addButton(HitBoxFilmography, () => {
+        cameraController.moveTo( 30, 30, -30, 0, 0, 0, 3800);
+        console.log('Filmography is clicked!');
         HTMLRemove();
-        HTMLAppear('skills');
+        HTMLAppear('filmography');
+    });
+
+    buttonManager.addButton(HitBoxCertificates, () => {
+        cameraController.moveTo( -30, 7, -30, 0, 0, 0, 3800);
+        console.log('Certificates is clicked!');
+        HTMLRemove();
+        HTMLAppear('certificates');
     });
 
     console.log('Buttons live');
 }
 
 function HTMLRemove() {
-    const aboutMeMain = document.getElementById('aboutMe');
-    const skillsMain = document.getElementById('skills');
+    //Bio, Film, Cert
+    const bioMain = document.getElementById('bio');
+    const filmographyMain = document.getElementById('filmography');
+    const certificatesyMain = document.getElementById('certificates');
 
-    aboutMeMain.style.visibility = 'hidden';
-    skillsMain.style.visibility = 'hidden';
+    if (bioMain) {
+        bioMain.style.opacity = '0';
+        bioMain.style.visibility = 'hidden';
+    }
+    
+    if (filmographyMain) {
+        filmographyMain.style.opacity = '0';
+        filmographyMain.style.visibility = 'hidden';
+    }
+
+    if (certificatesyMain) {
+        certificatesyMain.style.opacity = '0';
+        certificatesyMain.style.visibility = 'hidden';
+    }
 }
 
 function HTMLAppear( id ) {
     const element = document.getElementById(id);
-    element.style.visibility = 'visible';
-}
-
-/*
-function aboutMeHTMLRem() {
-    setTimeout(() => {
-        const contentBox = document.getElementById('contentBox');
-        contentBox.style.display = 'none';
-        contentBox.remove();
-    }, 100);
-    
-
-}
-async function aboutMeHTML() {
-    try {
-        const response = await fetch('../text_files/Something');
-        if (!response.ok) {
-            throw new Error('File not found');
-        }
-        const data = await response.text();
-        const cleanData = data.split('//# sourceMappingURL=')[0];
-
-        const contentBox = document.createElement('main');
-        contentBox.setAttribute('id', 'contentBox');
-        const header = document.createElement('header');
-        const headerText = document.createElement('p');
-        const contentSection = document.createElement('section');
-        const contentSectionTextSomething = document.createElement('h1');
-
-        headerText.className = 'header_text';
-        contentSectionTextSomething.className = 'ContentSectionText';
-        
-        headerText.textContent = "Обо мне!";
-        contentSectionTextSomething.textContent = cleanData;
-        console.log(data);
-
-        contentBox.appendChild(header);
-        contentBox.appendChild(contentSection);
-        contentSection.appendChild(contentSectionTextSomething);
-        header.appendChild(headerText);
-        document.body.appendChild(contentBox);
-        
-    } catch (err) {
-        console.error('Error reading file:', err);
+    if (element) {
+        element.style.visibility = 'visible';
+        element.style.opacity = 1;
     }
 }
-*/
+
 //Онимейшн
 let lastTime = performance.now();
 
@@ -699,5 +811,8 @@ resizeManager.forceResize();
 renderer.setAnimationLoop(animate);
 window.optimizationSystems = {
     dynamicResolution,
-    resizeManager
+    resizeManager,
+    floatingAnimation
 };
+
+window.FloatingAnimation = floatingAnimation;
