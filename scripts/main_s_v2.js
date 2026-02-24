@@ -749,12 +749,14 @@ function setupButtons() {
         cameraController.moveTo( 0, 7, 20, 0, 6.9, 0, 3800);
         console.log('Certificates Theatre is clicked!');
         HTMLRemove();
+        HTMLAppear('theatre');
     });
 
     buttonManager.addButton(HitBoxTutoring, () => {
-        cameraController.moveTo( 10, 10, -30, 0, 0, 0, 3800);
+        cameraController.moveTo( 10, 30, -30, 0, 0, 0, 3800);
         console.log('Tutoring is clicked!');
         HTMLRemove();
+        HTMLAppear('tutoring');
     });
 
 
@@ -785,13 +787,13 @@ function HTMLRemove() {
     }   
 
     if (tutoringMain) {
-        certificatesMain.style.opacity = '0';
-        certificatesMain.style.visibility = 'hidden';
+        tutoringMain.style.opacity = '0';
+        tutoringMain.style.visibility = 'hidden';
     }
 
-    if (theatreMainMain) {
-        certificatesMain.style.opacity = '0';
-        certificatesMain.style.visibility = 'hidden';
+    if (theatreMain) {
+        theatreMain.style.opacity = '0';
+        theatreMain.style.visibility = 'hidden';
     }
 }
 
