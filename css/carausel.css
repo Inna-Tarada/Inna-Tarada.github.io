@@ -5,7 +5,6 @@
     position: relative;
     overflow: hidden;
     cursor: grab;
-    touch-action: pan-y pinch-zoom;
 }
 
 .carousel:active { 

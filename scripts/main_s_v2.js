@@ -275,7 +275,7 @@ class FloatingAnimation {
         this.amplitude = isMobile ? 0.025 : 0.04;
         this.rotationAmplitude = isMobile ? 0.005 : 0.01;
         this.speed = 1;
-        this.excludedNames = ['star', 'HitBox', 'light', 'camera', 'Picture'];
+        this.excludedNames = ['star', 'light', 'camera', 'Picture'];
         
         this.animatedObjects = new Map();
         this.startTime = performance.now() / 1000;
@@ -389,15 +389,15 @@ class FloatingAnimation {
 // ========================= Глобальные переменные =========================
 let Building, PhotoFrame1, PhotoFrameScreen1;
 let cameraController, buttonManager, resizeManager;
-let HitBoxSkills, HitBoxAboutMe, HitBoxBio, HitBoxFilmography, HitBoxCertificates;
+let HitBoxTutoring, HitBoxTheatre, HitBoxBio, HitBoxFilmography, HitBoxCertificates;
 let dynamicResolution, floatingAnimation;
 
 // ========================= ХитБоксы =========================
 const HitBoxMaterial = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0, color: "#FF00FF" } );
-const HitBoxDefaultG = new THREE.BoxGeometry( 2, 0.23, 0.1 );
+const HitBoxDefaultG = new THREE.BoxGeometry( 1, 0.03, 0.1 );
 
-HitBoxSkills = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
-HitBoxAboutMe = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
+HitBoxTutoring = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
+HitBoxTheatre = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
 HitBoxBio = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
 HitBoxFilmography = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
 HitBoxCertificates = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
@@ -516,22 +516,16 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-scene.add(HitBoxAboutMe, HitBoxSkills, HitBoxBio, HitBoxCertificates, HitBoxFilmography);
+scene.add(HitBoxTheatre, HitBoxTutoring, HitBoxBio, HitBoxCertificates, HitBoxFilmography);
 camera.position.set( 0, 7, 0 );
 
-HitBoxAboutMe.position.set( 10, 10, 10);
-HitBoxSkills.position.set( 10, 10, 10);
+HitBoxTheatre.position.set( 0, 0.075, 0 );
+HitBoxTutoring.position.set( 0, 0.036, 0 );
 
-if (isMobile == true) {
-    HitBoxBio.position.set( 0.005, 7.8, -1 );
-    HitBoxFilmography.position.set( 0.005, 7.5, -1 );
-    HitBoxCertificates.position.set( 0.005, 7.2, -1 );
-}
-else {
-    HitBoxBio.position.set( 0.005, 7.6, -1.4 );
-    HitBoxFilmography.position.set( 0.005, 7.3, -1.4 );
-    HitBoxCertificates.position.set( 0.005, 7, -1.4 );
-}
+
+HitBoxBio.position.set( 0, 0.155, 0 );
+HitBoxFilmography.position.set( 0, 0.113, 0 );
+HitBoxCertificates.position.set( 0, 0, 0 );
 
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg'),
@@ -706,6 +700,7 @@ async function loadMultipleModels() {
     } catch (error) {
         console.error('Error loading models:', error);
     }
+    PhotoFrameScreen1.add(HitBoxTutoring, HitBoxTheatre, HitBoxBio, HitBoxFilmography, HitBoxCertificates);
 }
 
 // ========================= Объявление кнопочек =========================
