@@ -530,7 +530,8 @@ HitBoxCertificates.position.set( 0, 0, 0 );
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg'),
     antialias: !isMobile,
-    powerPreference: isMobile ? "low-power" : "high-performance"
+    //powerPreference: isMobile ? "low-power" : "high-performance"
+    powerPreference: "high-performance"
 });
 
 dynamicResolution = new DynamicResolution(renderer, isMobile ? 50 : 60);
