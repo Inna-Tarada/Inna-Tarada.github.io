@@ -745,6 +745,19 @@ function setupButtons() {
         HTMLAppear('certificates');
     });
 
+    buttonManager.addButton(HitBoxTheatre, () => {
+        cameraController.moveTo( 0, 7, 20, 0, 6.9, 0, 3800);
+        console.log('Certificates Theatre is clicked!');
+        HTMLRemove();
+    });
+
+    buttonManager.addButton(HitBoxTutoring, () => {
+        cameraController.moveTo( 10, 10, -30, 0, 0, 0, 3800);
+        console.log('Tutoring is clicked!');
+        HTMLRemove();
+    });
+
+
     console.log('Buttons live');
 }
 
@@ -752,7 +765,9 @@ function HTMLRemove() {
     //Bio, Film, Cert
     const bioMain = document.getElementById('bio');
     const filmographyMain = document.getElementById('filmography');
-    const certificatesyMain = document.getElementById('certificates');
+    const certificatesMain = document.getElementById('certificates');
+    const theatreMain = document.getElementById('theatre');
+    const tutoringMain = document.getElementById('tutoring');
 
     if (bioMain) {
         bioMain.style.opacity = '0';
@@ -764,9 +779,19 @@ function HTMLRemove() {
         filmographyMain.style.visibility = 'hidden';
     }
 
-    if (certificatesyMain) {
-        certificatesyMain.style.opacity = '0';
-        certificatesyMain.style.visibility = 'hidden';
+    if (certificatesMain) {
+        certificatesMain.style.opacity = '0';
+        certificatesMain.style.visibility = 'hidden';
+    }   
+
+    if (tutoringMain) {
+        certificatesMain.style.opacity = '0';
+        certificatesMain.style.visibility = 'hidden';
+    }
+
+    if (theatreMainMain) {
+        certificatesMain.style.opacity = '0';
+        certificatesMain.style.visibility = 'hidden';
     }
 }
 
