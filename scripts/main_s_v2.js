@@ -61,65 +61,6 @@ class DynamicResolution {
     }
 }
 
-// ========================= Менеджер ресайза =========================
-class ResizeManager {
-    constructor(camera, renderer, dynamicResolution) {
-        this.camera = camera;
-        this.renderer = renderer;
-        this.dynamicResolution = dynamicResolution;
-        this.resizeTimeout = null;
-        this.resizeDelay = 100; //ms
-    }
-    
-    onWindowResize = () => {
-        //Дебаунс чтобы избежать частых обновлений
-        if (this.resizeTimeout) {
-            clearTimeout(this.resizeTimeout);
-        }
-        
-        this.resizeTimeout = setTimeout(() => {
-            this.handleResize();
-        }, this.resizeDelay);
-    }
-    
-    handleResize() {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        
-        console.log(`Resizing to: ${width}x${height}`);
-        
-        try {
-            //Камера
-            this.camera.aspect = width / height;
-            this.camera.updateProjectionMatrix();
-            
-            //Рендерер
-            this.renderer.setSize(width, height, false);
-            
-            //Динамическое разрешение
-            this.dynamicResolution.applyResolutionScale();
-            this.camera.updateMatrixWorld();
-            
-            console.log(`Resize complete. Pixel ratio: ${this.renderer.getPixelRatio().toFixed(2)}`);
-            
-        } catch (error) {
-            console.error('Resize error:', error);
-        }
-    }
-    
-    //Принудительный ресайз
-    forceResize() {
-        this.handleResize();
-    }
-    
-    destroy() {
-        if (this.resizeTimeout) {
-            clearTimeout(this.resizeTimeout);
-        }
-        window.removeEventListener('resize', this.onWindowResize);
-    }
-}
-
 // ========================= Менеджер кнопочек =========================
 class ButtonManager {
     constructor() {
@@ -388,7 +329,7 @@ class FloatingAnimation {
 
 // ========================= Глобальные переменные =========================
 let Building, PhotoFrame1, PhotoFrameScreen1;
-let cameraController, buttonManager, resizeManager;
+let cameraController, buttonManager;
 let HitBoxTutoring, HitBoxTheatre, HitBoxBio, HitBoxFilmography, HitBoxCertificates;
 let dynamicResolution, floatingAnimation;
 
@@ -407,12 +348,11 @@ function initSystems(camera, renderer) {
     cameraController = new CameraController(camera, renderer);
     buttonManager = new ButtonManager();
     dynamicResolution = new DynamicResolution(renderer, isMobile ? 50 : 60);
-    resizeManager = new ResizeManager(camera, renderer, dynamicResolution);
     floatingAnimation = new FloatingAnimation();
 
     console.log('Optimization systems loaded. Mobile:', isMobile);
     
-    return { cameraController, buttonManager, dynamicResolution, resizeManager, floatingAnimation };
+    return { cameraController, buttonManager, dynamicResolution, floatingAnimation };
 }
 
 // ========================= Лоадинг менажер =========================
@@ -522,7 +462,6 @@ camera.position.set( 0, 7, 0 );
 HitBoxTheatre.position.set( 0, 0.075, 0 );
 HitBoxTutoring.position.set( 0, 0.036, 0 );
 
-
 HitBoxBio.position.set( 0, 0.155, 0 );
 HitBoxFilmography.position.set( 0, 0.113, 0 );
 HitBoxCertificates.position.set( 0, 0, 0 );
@@ -530,7 +469,6 @@ HitBoxCertificates.position.set( 0, 0, 0 );
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg'),
     antialias: !isMobile,
-    //powerPreference: isMobile ? "low-power" : "high-performance"
     powerPreference: "high-performance"
 });
 
@@ -894,6 +832,31 @@ function HTMLAppear( id ) {
     }
 }
 
+// ========== ПРОСТОЙ РАБОЧИЙ РЕСАЙЗ ==========
+
+// Простая функция, которая работает
+function handleResize() {
+    // Обновляем камеру
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    
+    // Обновляем рендерер
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    
+    // Если нужно динамическое разрешение
+    if (dynamicResolution) {
+        dynamicResolution.applyResolutionScale();
+    }
+    
+    console.log('Resize working:', window.innerWidth, 'x', window.innerHeight);
+}
+
+// Добавляем обработчик события - ПРОСТО И ПОНЯТНО
+window.addEventListener('resize', handleResize);
+
+// Вызываем сразу для установки правильных размеров
+handleResize();
+
 //Онимейшн
 let lastTime = performance.now();
 
@@ -947,7 +910,6 @@ loadMultipleModels();
 //Звездашки :3
 const starGeometry = new THREE.SphereGeometry(0.1, 24, 24);
 
-
 //Звездашки макер :33
 function starMaker() {
     const star = new THREE.Mesh(starGeometry, starMatterial);
@@ -959,18 +921,11 @@ function starMaker() {
 
 Array(isMobile ? 100 : 500).fill().forEach(starMaker);
 
-//Слухачи - теперь используем ResizeManager вместо прямой функции
-window.addEventListener('resize', resizeManager.onWindowResize, false);
-window.addEventListener('click', (event) => buttonManager.onClick(event), false);
-
-resizeManager.forceResize();
-
 //Онимейшн луууп
 renderer.setAnimationLoop(animate);
 window.optimizationSystems = {
     dynamicResolution,
-    resizeManager,
     floatingAnimation
 };
-//
+
 window.FloatingAnimation = floatingAnimation;
