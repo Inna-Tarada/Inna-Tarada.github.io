@@ -334,7 +334,7 @@ let HitBoxTutoring, HitBoxTheatre, HitBoxBio, HitBoxFilmography, HitBoxCertifica
 let dynamicResolution, floatingAnimation;
 
 // ========================= ХитБоксы =========================
-const HitBoxMaterial = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.5, color: "#FF00FF" } );
+const HitBoxMaterial = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0, color: "#FF00FF" } );
 const HitBoxDefaultG = new THREE.BoxGeometry( 1, 0.03, 0.1 );
 
 HitBoxTutoring = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
