@@ -466,7 +466,7 @@ HitBoxCertificates.position.set( 0, 0, 0 );
 
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg'),
-    antialias: 1,
+    antialias: !isMobile,
     powerPreference: "high-performance"
 });
 
