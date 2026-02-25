@@ -823,6 +823,7 @@ function HTMLRemove() {
 }
 
 function HTMLAppear( id ) {
+    window.scrollTo(0, 0);
     const element = document.getElementById(id);
     if (element) {
         element.style.visibility = 'visible';
