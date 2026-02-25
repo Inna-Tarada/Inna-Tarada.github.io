@@ -481,10 +481,14 @@ const mouse = new THREE.Vector2();
 initSystems(camera, renderer);
 
 //Свет
-const sun = new THREE.PointLight(0xffffff);
-sun.position.set(0.2, 10, -5);
-const ambientLight = new THREE.AmbientLight(0xffffff);
-scene.add(sun, ambientLight);
+//( 0.005, 6.4, -1.4 );
+const menuLight = new THREE.PointLight( 0xffffff );
+const sun = new THREE.PointLight( 0xffffff );
+sun.position.set( 0.2, 10, -5 );
+menuLight.position.set( 0.005, 9, 2 );
+const ambientLight = new THREE.AmbientLight( 0xffffff );
+scene.add(sun, ambientLight, menuLight);
+menuLight.intensity = 13;
 
 //Скабоксек
 function createSkyboxEquirectangular() {
