@@ -51,7 +51,7 @@ class DynamicResolution {
     }
     
     applyResolutionScale() {
-        const pixelRatio = Math.min(window.devicePixelRatio * this.currentScale, isMobile ? 1.5 : 2);
+        const pixelRatio = Math.min(window.devicePixelRatio * this.currentScale, 2);
         this.renderer.setPixelRatio(pixelRatio);
         console.log(`Dynamic resolution: scale ${this.currentScale.toFixed(2)}, pixelRatio ${pixelRatio.toFixed(2)}`);
     }
