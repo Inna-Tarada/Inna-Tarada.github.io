@@ -488,7 +488,7 @@ sun.position.set( 0.2, 10, -5 );
 menuLight.position.set( 0.005, 9, 2 );
 const ambientLight = new THREE.AmbientLight( 0xffffff );
 scene.add(sun, ambientLight, menuLight);
-menuLight.intensity = 13;
+menuLight.intensity = 7;
 
 //Скабоксек
 function createSkyboxEquirectangular() {
