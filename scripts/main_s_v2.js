@@ -757,14 +757,14 @@ function setupButtons() {
     });
 
     buttonManager.addButton(HitBoxFilmography, () => {
-        cameraController.moveTo( 30, 30, -30, 0, 0, 0, 3800);
+        cameraController.moveTo( -30, 30, 30, 0, 0, 0, 3800);
         console.log('Filmography is clicked!');
         HTMLRemove();
         HTMLAppear('filmography');
     });
 
     buttonManager.addButton(HitBoxCertificates, () => {
-        cameraController.moveTo( -30, 7, -30, 0, 0, 0, 3800);
+        cameraController.moveTo( -30, 20, 30, 0, 0, 0, 3800);
         console.log('Certificates is clicked!');
         HTMLRemove();
         HTMLAppear('certificates');
@@ -778,7 +778,7 @@ function setupButtons() {
     });
 
     buttonManager.addButton(HitBoxTutoring, () => {
-        cameraController.moveTo( 10, 30, -30, 0, 0, 0, 3800);
+        cameraController.moveTo( 30, 20, 30, 0, 0, 0, 3800);
         console.log('Tutoring is clicked!');
         HTMLRemove();
         HTMLAppear('tutoring');
@@ -823,12 +823,12 @@ function HTMLRemove() {
 }
 
 function HTMLAppear( id ) {
-    window.scrollTo(0, 0);
     const element = document.getElementById(id);
     if (element) {
         element.style.visibility = 'visible';
         element.style.opacity = 1;
     }
+    window.scrollTo(0, 0);
 }
 
 // ========== ПРОСТОЙ РАБОЧИЙ РЕСАЙЗ ==========
