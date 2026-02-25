@@ -553,11 +553,120 @@ scene.add(sun, ambientLight);
 //Скабоксек
 function createSkyboxEquirectangular() {
     const loader = new THREE.TextureLoader(loadingManager);
-    loader.load('../images/textures/colorful_space_skybox_lower_brightness.png', (texture) => {
+    loader.load('../images/textures/whiteSkyBox.jpg', (texture) => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = texture;
         scene.environment = texture;
     });
+}
+
+//========================= СкайбоксекПроцедура =========================
+
+let skyboxMesh;
+
+function createProceduralSkybox() {
+    const width = 4096;
+    const height = width;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, '#0a0a1a');
+    gradient.addColorStop(0.4, '#1a1030');
+    gradient.addColorStop(0.6, '#1a1030');
+    gradient.addColorStop(1, '#0a0a1a');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    const nebulaPurple = ctx.createRadialGradient(width*0.2, height*0.3, 0, width*0.2, height*0.3, width*0.5);
+    nebulaPurple.addColorStop(0, 'rgba(140, 80, 200, 0.7)');
+    nebulaPurple.addColorStop(0.5, 'rgba(80, 40, 120, 0.08)');
+    nebulaPurple.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = nebulaPurple;
+    ctx.fillRect(0, 0, width, height);
+
+    const nebulaBlue = ctx.createRadialGradient(width*0.8, height*0.7, 0, width*0.8, height*0.7, width*0.6);
+    nebulaBlue.addColorStop(0, 'rgba(60, 100, 220, 0.12)');
+    nebulaBlue.addColorStop(0.6, 'rgba(30, 50, 150, 0.05)');
+    nebulaBlue.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = nebulaBlue;
+    ctx.fillRect(0, 0, width, height);
+
+    const nebulaRed = ctx.createRadialGradient(width*0.5, height*0.2, 0, width*0.5, height*0.2, width*0.4);
+    nebulaRed.addColorStop(0, 'rgba(200, 80, 100, 0.1)');
+    nebulaRed.addColorStop(0.7, 'rgba(100, 30, 50, 0.03)');
+    nebulaRed.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = nebulaRed;
+    ctx.fillRect(0, 0, width, height);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.repeat.set(1, 1);
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = true;
+    
+    const geometry = new THREE.SphereGeometry(500, 128, 64);
+    
+    const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.BackSide,
+        toneMapped: true
+    });
+    
+    if (skyboxMesh) scene.remove(skyboxMesh);
+    
+    skyboxMesh = new THREE.Mesh(geometry, material);
+    skyboxMesh.name = 'Skybox';
+    scene.add(skyboxMesh);
+
+    scene.background = null;
+}
+
+function createMobileOptimizedSkybox() {
+    const width = 2048;
+    const height = width;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, '#0a0a1a');
+    gradient.addColorStop(0.5, '#1a1030');
+    gradient.addColorStop(1, '#0a0a1a');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    const nebula = ctx.createRadialGradient(width*0.5, height*0.5, 0, width*0.5, height*0.5, width*0.7);
+    nebula.addColorStop(0, 'rgba(100, 70, 150, 0.1)');
+    nebula.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = nebula;
+    ctx.fillRect(0, 0, width, height);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    
+    const geometry = new THREE.SphereGeometry(500, 64, 32);
+    
+    if (skyboxMesh) scene.remove(skyboxMesh);
+    
+    skyboxMesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.BackSide
+    }));
+    skyboxMesh.name = 'Skybox';
+    scene.add(skyboxMesh);
+    
+    scene.background = null;
 }
 
 //Загрузка текстурок
@@ -610,26 +719,6 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 sun.intensity = 100.0;
 ambientLight.intensity = 1.2;
 renderer.toneMappingExposure = 0.7;
-
-//Звездашки :3
-const starGeometry = new THREE.SphereGeometry(0.1, 24, 24);
-const starMatterial = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    roughness: 0,
-    emissive: 0xffffff,
-    emissiveIntensity: 12
-});
-
-//Звездашки макер :33
-function starMaker() {
-    const star = new THREE.Mesh(starGeometry, starMatterial);
-    star.name = 'star_' + Math.random();
-    const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(100));
-    star.position.set(x, y, z);
-    scene.add(star);
-}
-
-Array(isMobile ? 100 : 200).fill().forEach(starMaker);
 
 // ========================= Лоадинг моделей =========================
 const dracoLoader = new DRACOLoader(loadingManager);
@@ -809,6 +898,7 @@ function HTMLAppear( id ) {
 let lastTime = performance.now();
 
 function animate() {
+
     const currentTime = performance.now();
     const delta = currentTime - lastTime;
 
@@ -821,8 +911,53 @@ function animate() {
 }
 
 //Инициализайшен
-createSkyboxEquirectangular();
+let starMatterial; 
+let skyBoxOrNot = Math.random();
+let whiteSpaceOrNot= Math.random();
+if (skyBoxOrNot > 0.1) {
+    if (whiteSpaceOrNot < 0.8 ) {
+        if (isMobile) {
+            createMobileOptimizedSkybox();
+            starMatterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                roughness: 0,
+                emissive: 0xffffff,
+                emissiveIntensity: 12
+            });
+        } else {
+            createProceduralSkybox();
+            starMatterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                roughness: 0,
+                emissive: 0xffffff,
+                emissiveIntensity: 12
+            }); 
+        }
+    } else {
+        scene.background = new THREE.Color(0xffffff);
+        starMatterial = new THREE.MeshStandardMaterial({
+            color: 0x000000,
+            roughness: 0,
+            emissive: 0x000000,
+            emissiveIntensity: 12
+        });
+    }
+}
 loadMultipleModels();
+//Звездашки :3
+const starGeometry = new THREE.SphereGeometry(0.1, 24, 24);
+
+
+//Звездашки макер :33
+function starMaker() {
+    const star = new THREE.Mesh(starGeometry, starMatterial);
+    star.name = 'star_' + Math.random();
+    const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(100));
+    star.position.set(x, y, z);
+    scene.add(star);
+}
+
+Array(isMobile ? 100 : 500).fill().forEach(starMaker);
 
 //Слухачи - теперь используем ResizeManager вместо прямой функции
 window.addEventListener('resize', resizeManager.onWindowResize, false);
