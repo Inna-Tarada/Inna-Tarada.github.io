@@ -334,7 +334,7 @@ let HitBoxTutoring, HitBoxTheatre, HitBoxBio, HitBoxFilmography, HitBoxCertifica
 let dynamicResolution, floatingAnimation;
 
 // ========================= ХитБоксы =========================
-const HitBoxMaterial = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0, color: "#FF00FF" } );
+const HitBoxMaterial = new THREE.MeshBasicMaterial( {transparent: true, opacity: 0.5, color: "#FF00FF" } );
 const HitBoxDefaultG = new THREE.BoxGeometry( 1, 0.03, 0.1 );
 
 HitBoxTutoring = new THREE.Mesh(HitBoxDefaultG, HitBoxMaterial);
@@ -456,12 +456,10 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-scene.add(HitBoxTheatre, HitBoxTutoring, HitBoxBio, HitBoxCertificates, HitBoxFilmography);
 camera.position.set( 0, 7, 0 );
 
 HitBoxTheatre.position.set( 0, 0.075, 0 );
 HitBoxTutoring.position.set( 0, 0.036, 0 );
-
 HitBoxBio.position.set( 0, 0.155, 0 );
 HitBoxFilmography.position.set( 0, 0.113, 0 );
 HitBoxCertificates.position.set( 0, 0, 0 );
@@ -834,7 +832,6 @@ function HTMLAppear( id ) {
 
 // ========== ПРОСТОЙ РАБОЧИЙ РЕСАЙЗ ==========
 
-// Простая функция, которая работает
 function handleResize() {
     // Обновляем камеру
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -929,3 +926,5 @@ window.optimizationSystems = {
 };
 
 window.FloatingAnimation = floatingAnimation;
+
+window.addEventListener('click', (event) => buttonManager.onClick(event), false);
