@@ -929,3 +929,5 @@ window.optimizationSystems = {
 window.FloatingAnimation = floatingAnimation;
 
 window.addEventListener('click', (event) => buttonManager.onClick(event), false);
+
+//
