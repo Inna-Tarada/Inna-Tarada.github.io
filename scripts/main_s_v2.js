@@ -35,6 +35,8 @@ class DynamicResolution {
     }
     
     adjustQuality() {
+        if (this.frames.length === 0) return;
+
         const avgFPS = this.frames.reduce((a, b) => a + b) / this.frames.length;
         let newScale = this.currentScale;
         
@@ -80,22 +82,18 @@ class ButtonManager {
         this.buttons.delete(buttonMesh);
     }
     
+    // Внутри класса ButtonManager замените метод onClick:
+
     onClick(event) {
+
         this.onMouseMove(event);
-        
-        //Обновление матрицы объектов
-        scene.traverse(object => {
-            if (object.isMesh) {
-                object.updateMatrixWorld(true);
-            }
-        });
         
         raycaster.setFromCamera(mouse, camera);
         
-        //Сборка всех мешей, даже дочерних
+        // Сборка всех мешей, даже дочерних
         const allMeshes = [];
         this.buttons.forEach((callback, buttonObject) => {
-            //Если объект имеет дочерние меши, добавляем их все
+            // Если объект имеет дочерние меши, добавляем их все
             buttonObject.traverse((child) => {
                 if (child.isMesh) {
                     allMeshes.push(child);
@@ -108,7 +106,7 @@ class ButtonManager {
         if (intersects.length > 0) {
             const clickedMesh = intersects[0].object;
             
-            //Поиск родительского объекта
+            // Поиск родительского объекта
             let parentObject = clickedMesh;
             while (parentObject.parent && !this.buttons.has(parentObject)) {
                 parentObject = parentObject.parent;
@@ -269,21 +267,15 @@ class FloatingAnimation {
         }
     }
 
+
     start() {
-        if (this.animationFrame) {
-            cancelAnimationFrame(this.animationFrame);
-        }
-        
+        this.enabled = true;
         this.startTime = performance.now() / 1000;
-        this.animate();
         console.log('Floating animation started');
     }
 
     stop() {
-        if (this.animationFrame) {
-            cancelAnimationFrame(this.animationFrame);
-            this.animationFrame = null;
-        }
+        this.enabled = false;
         
         this.animatedObjects.forEach((data, obj) => {
             if (obj && obj.position) {
@@ -295,10 +287,10 @@ class FloatingAnimation {
         });
     }
 
-    animate = () => {
+    update(currentTime) {
         if (!this.enabled) return;
 
-        const time = (performance.now() / 1000 - this.startTime) * this.speed;
+        const time = (currentTime / 1000 - this.startTime) * this.speed;
         
         this.animatedObjects.forEach((data, obj) => {
             if (!obj || !obj.position) return;
@@ -314,8 +306,6 @@ class FloatingAnimation {
                 this.animatedObjects.delete(obj);
             }
         });
-
-        this.animationFrame = requestAnimationFrame(this.animate);
     }
 
     addObject(obj) {
@@ -640,6 +630,11 @@ function applyTextureToPhotoFrame(model, texture, targetName = 'Picture') {
     model.traverse((child) => {
         if (child.isMesh && child.material) {
             if (child.name.includes(targetName)) {
+                
+                if (child.material.dispose) {
+                    child.material.dispose();
+                }
+
                 const newMaterial = new THREE.MeshStandardMaterial({
                     map: texture,
                     roughness: 0.7,
@@ -836,8 +831,6 @@ function HTMLAppear( id ) {
     window.scrollTo(0, 0);
 }
 
-// ========== ПРОСТОЙ РАБОЧИЙ РЕСАЙЗ ==========
-
 function handleResize() {
     // Обновляем камеру
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -854,21 +847,24 @@ function handleResize() {
     console.log('Resize working:', window.innerWidth, 'x', window.innerHeight);
 }
 
-// Добавляем обработчик события - ПРОСТО И ПОНЯТНО
 window.addEventListener('resize', handleResize);
 
-// Вызываем сразу для установки правильных размеров
 handleResize();
 
 //Онимейшн
 let lastTime = performance.now();
 
-function animate() {
+// Замените функцию animate:
 
+function animate() {
     const currentTime = performance.now();
     const delta = currentTime - lastTime;
 
     dynamicResolution.update();
+    
+    if (floatingAnimation && floatingAnimation.enabled) {
+        floatingAnimation.update(currentTime);
+    }
     
     cameraController.update();
     renderer.render(scene, camera);
