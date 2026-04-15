@@ -1,4 +1,5 @@
 (function() {
+    // ===== YOUR IMAGES HERE =====
     const imageUrls = [
         '../images/placeholdercar/1.jpg',
         '../images/placeholdercar/2.jpg',
@@ -9,107 +10,127 @@
         '../images/placeholdercar/7.jpg',
         '../images/placeholdercar/8.jpg'
     ];
+    // ============================
 
     const track = document.getElementById('track');
     const carousel = document.getElementById('carousel');
     
-    if (!track || !carousel) return;
-
-    // Дублируем контент для бесшовного зацикливания
-    const fullList = [...imageUrls, ...imageUrls];
-    track.innerHTML = '';
+    // State
+    let angle = 0;
+    let spinning = true;
+    let dir = 1;
+    let speed = 2;
+    let dragging = false;
+    let startX, startAngle;
     
-    fullList.forEach((url, i) => {
+    // Clear existing content
+    if (track) {
+        track.innerHTML = '';
+    }
+    
+    // Create items
+    imageUrls.forEach((url, i) => {
         const item = document.createElement('div');
         item.className = 'item';
+        
+        // Create image element to handle errors
         const img = new Image();
         img.src = url;
-        img.alt = `Certificate ${i + 1}`;
+        img.alt = `Image ${i + 1}`;
         img.onerror = function() {
-            this.src = 'https://via.placeholder.com/300x400/1a1a2e/ffffff?text=Certificate+' + ((i % imageUrls.length) + 1);
+            // Fallback if image fails to load
+            this.src = 'https://via.placeholder.com/400x400/1a1a2e/ffffff?text=Image+' + (i + 1);
         };
+        
         item.appendChild(img);
+        
+        const span = document.createElement('span');
+        span.textContent = `Image ${i + 1}`;
+        item.appendChild(span);
+        
         track.appendChild(item);
     });
-
-    // Состояние
-    let scrollPos = 0;
-    let isInteracting = false;
-    let isDragging = false;
-    let startX;
-    let scrollLeftStart;
-    const speed = 0.8; // Скорость вращения (пиксели за кадр)
-
-    // Анимация
-    function animate() {
-        if (!isInteracting && !isDragging) {
-            scrollPos += speed;
+    
+    const items = document.querySelectorAll('.item');
+    const total = items.length;
+    
+    function updatePositions() {
+        const radius = 700;
+        const step = (2 * Math.PI) / total;
+        
+        items.forEach((item, i) => {
+            const itemAngle = i * step + (angle * Math.PI / 180);
+            const x = Math.sin(itemAngle) * radius;
+            const z = Math.cos(itemAngle) * radius;
+            const scale = (z + radius) / (radius * 2) + 0.5;
             
-            // Если дошли до середины (конца первого набора), прыгаем в начало
-            if (scrollPos >= track.scrollWidth / 2) {
-                scrollPos = 0;
-            }
-            carousel.scrollLeft = scrollPos;
+            item.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${-itemAngle}rad) scale(${scale})`;
+            item.style.opacity = Math.max(0.4, Math.min(1, scale));
+            item.style.zIndex = Math.floor(z + radius);
+        });
+    }
+    
+    // Mouse/Touch events
+    function startDrag(e) {
+        e.preventDefault();
+        const pos = e.type === 'touchstart' ? e.touches[0] : e;
+        dragging = true;
+        startX = pos.clientX;
+        startAngle = angle;
+        carousel.style.cursor = 'grabbing';
+    }
+    
+    function onDrag(e) {
+        if (!dragging) return;
+        e.preventDefault();
+        const pos = e.type === 'touchmove' ? e.touches[0] : e;
+        const delta = (pos.clientX - startX) * 0.3;
+        angle = startAngle + delta;
+        updatePositions();
+    }
+    
+    function stopDrag() {
+        dragging = false;
+        carousel.style.cursor = 'grab';
+    }
+    
+    // Events
+    if (carousel) {
+        carousel.addEventListener('mousedown', startDrag);
+        carousel.addEventListener('touchstart', startDrag, { passive: false });
+    }
+    
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('touchmove', onDrag, { passive: false });
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchend', stopDrag);
+    
+    // Add keyboard controls (optional)
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+            dir = -1;
+            spinning = true;
+        } else if (e.key === 'ArrowRight') {
+            dir = 1;
+            spinning = true;
+        } else if (e.key === ' ') {
+            spinning = !spinning;
+            e.preventDefault();
+        }
+    });
+    
+    // Animation
+    function animate() {
+        if (spinning && !dragging) {
+            angle += dir * (speed * 0.1);
+            updatePositions();
         }
         requestAnimationFrame(animate);
     }
-
-    // Обработка взаимодействия (пауза при наведении)
-    carousel.addEventListener('mouseenter', () => isInteracting = true);
-    carousel.addEventListener('mouseleave', () => {
-        if (!isDragging) isInteracting = false;
-    });
-
-    // Drag-н-дроп (мышь)
-    carousel.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        isInteracting = true;
-        startX = e.pageX - carousel.offsetLeft;
-        scrollLeftStart = carousel.scrollLeft;
-        carousel.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const x = e.pageX - carousel.offsetLeft;
-        const walk = (x - startX);
-        carousel.scrollLeft = scrollLeftStart - walk;
-        scrollPos = carousel.scrollLeft; // Синхронизируем позицию анимации
-    });
-
-    window.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-            carousel.style.cursor = 'grab';
-            // Небольшая задержка перед возобновлением, если мышь все еще над каруселью
-            if (!carousel.matches(':hover')) {
-                isInteracting = false;
-            }
-        }
-    });
-
-    // Touch-события для мобилок
-    carousel.addEventListener('touchstart', (e) => {
-        isInteracting = true;
-        isDragging = true;
-        startX = e.touches[0].pageX - carousel.offsetLeft;
-        scrollLeftStart = carousel.scrollLeft;
-    }, { passive: true });
-
-    carousel.addEventListener('touchend', () => {
-        isDragging = false;
-        isInteracting = false;
-        scrollPos = carousel.scrollLeft;
-    }, { passive: true });
-
-    carousel.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        const x = e.touches[0].pageX - carousel.offsetLeft;
-        const walk = (x - startX);
-        carousel.scrollLeft = scrollLeftStart - walk;
-    }, { passive: true });
-
-    // Запуск
-    requestAnimationFrame(animate);
+    
+    // Initialize
+    if (total > 0) {
+        updatePositions();
+        animate();
+    }
 })();

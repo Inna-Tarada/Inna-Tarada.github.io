@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+import './carousel.js';
 
 // ========================= Динамическое разрешение =========================
 class DynamicResolution {
