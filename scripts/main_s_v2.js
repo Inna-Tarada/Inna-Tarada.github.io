@@ -848,12 +848,8 @@ function handleResize() {
     console.log('Resize working:', window.innerWidth, 'x', window.innerHeight);
 }
 
-
 window.addEventListener('resize', handleResize);
-window.addEventListener('load', handleResize);
-document.addEventListener('DOMContentLoaded', handleResize);
-setTimeout(handleResize, 100);
-setTimeout(handleResize, 500);
+
 
 handleResize();
 
