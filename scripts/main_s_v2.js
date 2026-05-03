@@ -3,8 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-import { initCarousel } from './carousel.js';
-import { FloatingAnimation } from './floatingAnimation.js';
+import './carousel.js';
 
 // ========================= Динамическое разрешение =========================
 class DynamicResolution {
@@ -132,9 +131,6 @@ class CameraController {
         this.speed = 0.05;
         this.isMoving = false;
         
-        // Use a dummy object to calculate the target quaternion
-        this.dummyCamera = new THREE.PerspectiveCamera();
-        
         this.cameraAngles = new Map();
         this.setupCameraAngles();
     }
@@ -185,22 +181,22 @@ class CameraController {
         if (!this.isMoving) return;
 
         const positionDistance = this.camera.position.distanceTo(this.targetPosition);
+        const lookAtDistance = this.camera.getWorldDirection(new THREE.Vector3())
+            .distanceTo(this.targetLookAt.clone().sub(this.camera.position).normalize());
 
-        // Calculate the target rotation using a dummy camera
-        this.dummyCamera.position.copy(this.camera.position);
-        this.dummyCamera.lookAt(this.targetLookAt);
-        const targetQuaternion = this.dummyCamera.quaternion;
-        
-        const rotationAngle = this.camera.quaternion.angleTo(targetQuaternion);
-
-        // Move position
+        //Изменение позиции
         this.camera.position.lerp(this.targetPosition, this.speed);
         
-        // Smooth spherical interpolation for rotation
-        this.camera.quaternion.slerp(targetQuaternion, this.speed);
+        //Мягкие движения
+        const currentLookAt = new THREE.Vector3();
+        this.camera.getWorldDirection(currentLookAt);
+        currentLookAt.add(this.camera.position);
+        
+        const smoothedLookAt = currentLookAt.lerp(this.targetLookAt, this.speed);
+        this.camera.lookAt(smoothedLookAt);
 
-        // Stop if close enough
-        if (positionDistance < 0.005 && rotationAngle < 0.01) {
+        //Остановка, если достаточно близко
+        if (positionDistance < 0.005 && lookAtDistance < 0.01) {
             this.isMoving = false;
         }
     }
@@ -212,6 +208,115 @@ class CameraController {
     toScreenView() { return this.moveToAngle('screenView'); }
 }
 
+// ========================= Анимация полета крч =========================
+class FloatingAnimation {
+    constructor() {
+        this.enabled = true;
+        this.amplitude = isMobile ? 0.025 : 0.04;
+        this.rotationAmplitude = isMobile ? 0.005 : 0.01;
+        this.speed = 1;
+        this.excludedNames = ['star', 'light', 'camera', 'Picture'];
+        
+        this.animatedObjects = new Map();
+        this.startTime = performance.now() / 1000;
+        this.animationFrame = null;
+        
+        console.log('Floating Animation System initialized');
+    }
+
+    shouldExclude(obj) {
+        if (!obj || !obj.name) return false;
+        return this.excludedNames.some(pattern => 
+            obj.name.toLowerCase().includes(pattern.toLowerCase())
+        );
+    }
+
+    scanScene() {
+        if (!window.scene) return;
+        
+        console.log('Scanning scene for floating animation...');
+        this.animatedObjects.clear();
+        
+        window.scene.children.forEach(child => {
+            this.prepareRootObject(child);
+        });
+
+        console.log(`Floating animation: ${this.animatedObjects.size} root objects registered`);
+    }
+
+    prepareRootObject(obj) {
+        if (!obj || !obj.isObject3D) return;
+
+        if (obj.isLight || obj.isCamera || this.shouldExclude(obj)) {
+            return;
+        }
+
+        let hasMeshes = false;
+        obj.traverse(child => {
+            if (child.isMesh) hasMeshes = true;
+        });
+
+        if (hasMeshes && !this.animatedObjects.has(obj)) {
+            this.animatedObjects.set(obj, {
+                originalY: obj.position.y,
+                originalRotX: obj.rotation.x,
+                originalRotY: obj.rotation.y,
+                originalRotZ: obj.rotation.z,
+                offset: Math.random() * Math.PI * 2,
+            });
+            console.log(`Added root object: ${obj.name || 'unnamed'}`);
+        }
+    }
+
+
+    start() {
+        this.enabled = true;
+        this.startTime = performance.now() / 1000;
+        console.log('Floating animation started');
+    }
+
+    stop() {
+        this.enabled = false;
+        
+        this.animatedObjects.forEach((data, obj) => {
+            if (obj && obj.position) {
+                obj.position.y = data.originalY;
+                obj.rotation.x = data.originalRotX;
+                obj.rotation.y = data.originalRotY;
+                obj.rotation.z = data.originalRotZ;
+            }
+        });
+    }
+
+    update(currentTime) {
+        if (!this.enabled) return;
+
+        const time = (currentTime / 1000 - this.startTime) * this.speed;
+        
+        this.animatedObjects.forEach((data, obj) => {
+            if (!obj || !obj.position) return;
+
+            try {
+                const floatY = Math.sin(time + data.offset) * this.amplitude;
+                obj.position.y = data.originalY + floatY;
+
+                if (obj.rotation && this.rotationAmplitude > 0) {
+                    obj.rotation.y = data.originalRotY + Math.sin(time * 0.3 + data.offset) * this.rotationAmplitude;
+                }
+            } catch (e) {
+                this.animatedObjects.delete(obj);
+            }
+        });
+    }
+
+    addObject(obj) {
+        this.prepareRootObject(obj);
+    }
+
+    removeObject(obj) {
+        this.animatedObjects.delete(obj);
+    }
+}
 
 // ========================= Глобальные переменные =========================
 let Building, PhotoFrame1, PhotoFrameScreen1;
@@ -614,7 +719,7 @@ async function loadMultipleModels() {
 
         setTimeout(() => {
             if (floatingAnimation) {
-                floatingAnimation.scanScene(scene);
+                floatingAnimation.scanScene();
                 floatingAnimation.start();
             }
         }, 1000);
@@ -743,7 +848,12 @@ function handleResize() {
     console.log('Resize working:', window.innerWidth, 'x', window.innerHeight);
 }
 
+
 window.addEventListener('resize', handleResize);
+window.addEventListener('load', handleResize);
+document.addEventListener('DOMContentLoaded', handleResize);
+setTimeout(handleResize, 100);
+setTimeout(handleResize, 500);
 
 handleResize();
 
