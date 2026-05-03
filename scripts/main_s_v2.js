@@ -4,6 +4,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 import './carousel.js';
+import './xp-popup.js';
 import { FloatingAnimation } from './floatingAnimation.js';
 
 // ========================= Динамическое разрешение =========================
@@ -723,6 +724,9 @@ function HTMLAppear( id ) {
     if (element) {
         element.style.visibility = 'visible';
         element.style.opacity = 1;
+    }
+    if ( id == "bio" ) {
+        window.showInnaMalware();
     }
     window.scrollTo(0, 0);
 }
