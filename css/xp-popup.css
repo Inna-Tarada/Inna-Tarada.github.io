@@ -135,3 +135,17 @@
     outline: 1px dotted #000;
     outline-offset: -4px;
 }
+
+#xpPopupContainer,
+#xpWelcomePopupContainer {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Затемнение фона */
+    z-index: 99999; /* Поверх всего */
+    justify-content: center;
+    align-items: center;
+}

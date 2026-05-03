@@ -253,31 +253,38 @@ loadingScreen.style.cssText = `
     left: 0;
     width: 100%;
     height: 100%;
-    background: #000000d1;
+    background: #000000; /* Чёрный фон классической загрузки */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 100000; /* Должен быть поверх всего, даже окон */
     color: white;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Tahoma, 'Segoe UI', sans-serif; /* Шрифт системы */
 `;
+
+// Имитация логотипа Windows XP
+const logoText = document.createElement('div');
+logoText.innerHTML = '<span style="font-size: 40px; font-weight: bold; font-style: italic;">Microsoft <span style="color: #ff6b00;">Windows</span> <span style="color: #0058ee;">XP</span></span>';
+logoText.style.marginBottom = '50px';
+loadingScreen.appendChild(logoText);
 
 const loadingText = document.createElement('div');
 loadingText.id = 'loading-text';
-loadingText.textContent = 'Загрузка...';
+loadingText.textContent = 'Загрузка системы...';
 loadingText.style.cssText = `
-    font-size: 24px;
-    margin-bottom: 20px;
+    font-size: 14px;
+    margin-bottom: 10px;
 `;
 
 const progressBarContainer = document.createElement('div');
 progressBarContainer.style.cssText = `
-    width: 300px;
-    height: 20px;
-    background: #333;
-    border-radius: 10px;
-    overflow: hidden;
+    width: 250px;
+    height: 18px;
+    background: #000;
+    border: 2px solid #b2b2b2; /* Серая рамка загрузочной полосы XP */
+    border-radius: 4px;
+    padding: 2px;
 `;
 
 const progressBar = document.createElement('div');
@@ -285,9 +292,15 @@ progressBar.id = 'progress-bar';
 progressBar.style.cssText = `
     width: 0%;
     height: 100%;
-    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    /* Классическая синяя полоса с разделением на квадратики */
+    background-image: repeating-linear-gradient(
+        to right,
+        #2540ff,
+        #2540ff 7px,
+        transparent 7px,
+        transparent 9px
+    );
     transition: width 0.3s ease;
-    border-radius: 10px;
 `;
 
 const progressText = document.createElement('div');
@@ -295,7 +308,8 @@ progressText.id = 'progress-text';
 progressText.textContent = '0%';
 progressText.style.cssText = `
     margin-top: 10px;
-    font-size: 16px;
+    font-size: 12px;
+    color: #b2b2b2;
 `;
 
 progressBarContainer.appendChild(progressBar);
@@ -308,14 +322,39 @@ loadingManager.onStart = function (url, itemsLoaded, itemsTotal) {
     console.log('Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
 };
 
+let finalLoadTimer; // Создаем переменную для таймера
+
 loadingManager.onLoad = function () {
-    console.log('Зазгрузились :3');
-    loadingScreen.style.transition = 'opacity 0.5s ease';
-    loadingScreen.style.opacity = '0';
+    console.log('Менеджер сообщил о завершении... (проверяем)');
     
-    setTimeout(() => {
-        loadingScreen.style.display = 'none';
-    }, 500);
+    // Если менеджер вызвал onLoad, но потом снова начал грузить,
+    // мы сбрасываем предыдущий таймер
+    clearTimeout(finalLoadTimer); 
+    
+    // Заводим таймер на 500мс. Если за это время новые файлы не начнут грузиться,
+    // значит загрузка РЕАЛЬНО завершена
+    finalLoadTimer = setTimeout(() => {
+        console.log('ФИНАЛЬНАЯ ЗАГРУЗКА ЗАВЕРШЕНА НА 100%!');
+        
+        loadingScreen.style.transition = 'opacity 0.5s ease';
+        loadingScreen.style.opacity = '0';
+        
+        setTimeout(() => {
+            // Убираем экран загрузки
+            loadingScreen.style.display = 'none';
+            
+            // Ищем и вызываем окно WELCOME
+            const welcomePopup = document.getElementById('xpWelcomePopupContainer');
+            
+            console.log("Блок Welcome.exe найден?:", welcomePopup !== null); // Для проверки в консоли
+            
+            if (welcomePopup) {
+                welcomePopup.style.display = 'flex';
+            } else {
+                console.error("ОШИБКА: HTML-код Welcome.exe не найден на странице!");
+            }
+        }, 500);
+    }, 500); // Время ожидания перед тем, как поверить менеджеру
 };
 
 loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
@@ -328,8 +367,8 @@ loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
 
 loadingManager.onError = function (url) {
     console.log('There was an error loading ' + url);
-    loadingText.textContent = 'Проблема с загрузкой ресурсов, перезагрузите страницу, пожалуйста :3';
-    loadingText.style.color = '#ff6b6b';
+    loadingText.textContent = 'Критическая ошибка системы. Перезагрузите ПК.';
+    loadingText.style.color = '#ff5252';
 };
 
 //Инициализация сцены+камеры
