@@ -1,37 +1,43 @@
-.carouselSection {
-    grid-column: 2 / 22;
-    width: 100%;
-}
 
-.swiper {
+.carousel {
     width: 100%;
     height: 50vh;
-    padding: 20px 0; /* Чтобы тени от карточек не обрезались */
-}
-
-.swiper-slide.item {
-    width: 280px; /* Задаем жесткую ширину для слайда */
-    height: 280px;
-    border-radius: 20px;
+    position: relative;
     overflow: hidden;
-    background: #1a1a2e;
-    transition: transform 0.3s ease;
+    cursor: grab;
 }
 
-.swiper-slide.item img {
+.carousel:active { 
+    cursor: grabbing; 
+}
+
+.track {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    pointer-events: none; /* Чтобы картинка не тащилась как файл */
+    position: relative;
+    transform-style: preserve-3d;
 }
 
-/* Мобилки */
-@media (max-width: 768px) {
-    .swiper {
-        height: 40vh;
-    }
-    .swiper-slide.item {
-        width: 220px;
-        height: 220px;
-    }
+.item {
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    left: 50%;
+    top: 20%;
+    margin-left: -140px;
+    margin-top: -20px;
+    border-radius: 20px;
+    overflow: hidden;
+    backface-visibility: visible;
+}
+
+.item img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    pointer-events: none;
+}
+
+.carouselSection {
+    grid-column: 2 / 22;
 }

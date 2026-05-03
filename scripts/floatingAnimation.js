@@ -3,7 +3,7 @@ export class FloatingAnimation {
     constructor() {
         this.enabled = true;
         this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        this.amplitude = this.isMobile ? 0.042 : 0.04;
+        this.amplitude = this.isMobile ? 0.025 : 0.04;
         this.rotationAmplitude = this.isMobile ? 0.005 : 0.01;
         this.speed = 1;
         this.excludedNames = ['star', 'light', 'camera', 'Picture', 'HitBox'];
