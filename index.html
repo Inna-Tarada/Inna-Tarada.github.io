@@ -9,6 +9,7 @@
 		<link rel="manifest" href="/manifest.json">
         <link rel="icon" type="image/png" href="./images/icon-192.png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     </head>
     <body>
         
@@ -64,8 +65,9 @@
                 <p class="header_text">Сертификаты</p>
             </header>
             <section class="carouselSection">
-                <div class="carousel" id="carousel">
-                    <div class="track" id="track"></div>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper" id="track">
+                    </div>
                 </div>
             </section>
         </main>
@@ -128,7 +130,7 @@
                 <p style="margin-top: 2rem; font-size: 1.5rem; text-align: center; font-weight: bold;">Открывайте своё сердце искусству. Я помогу вам сделать первый шаг!</p>
             </section>
         </main>
-        
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
         <script type="module" src="./scripts/carousel.js"></script>
     </body>
 </html>

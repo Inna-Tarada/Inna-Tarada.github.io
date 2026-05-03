@@ -1,5 +1,4 @@
-(function() {
-    // ===== YOUR IMAGES HERE =====
+export function initCarousel() {
     const imageUrls = [
         '../images/placeholdercar/1.jpg',
         '../images/placeholdercar/2.jpg',
@@ -10,127 +9,47 @@
         '../images/placeholdercar/7.jpg',
         '../images/placeholdercar/8.jpg'
     ];
-    // ============================
 
     const track = document.getElementById('track');
-    const carousel = document.getElementById('carousel');
-    
-    // State
-    let angle = 0;
-    let spinning = true;
-    let dir = 1;
-    let speed = 2;
-    let dragging = false;
-    let startX, startAngle;
-    
-    // Clear existing content
-    if (track) {
-        track.innerHTML = '';
-    }
-    
-    // Create items
+    if (!track || track.children.length > 0) return;
+
+    // Generate slides
+    const fragment = document.createDocumentFragment();
     imageUrls.forEach((url, i) => {
-        const item = document.createElement('div');
-        item.className = 'item';
+        const slide = document.createElement('div');
+        // Swiper requires the 'swiper-slide' class
+        slide.className = 'swiper-slide item';
         
-        // Create image element to handle errors
         const img = new Image();
         img.src = url;
-        img.alt = `Image ${i + 1}`;
-        img.onerror = function() {
-            // Fallback if image fails to load
-            this.src = 'https://via.placeholder.com/400x400/1a1a2e/ffffff?text=Image+' + (i + 1);
-        };
+        img.loading = 'lazy';
+        img.alt = `Certificate placeholder ${i + 1}`;
         
-        item.appendChild(img);
-        
-        const span = document.createElement('span');
-        span.textContent = `Image ${i + 1}`;
-        item.appendChild(span);
-        
-        track.appendChild(item);
+        slide.appendChild(img);
+        fragment.appendChild(slide);
     });
     
-    const items = document.querySelectorAll('.item');
-    const total = items.length;
-    
-    function updatePositions() {
-        const radius = 700;
-        const step = (2 * Math.PI) / total;
-        
-        items.forEach((item, i) => {
-            const itemAngle = i * step + (angle * Math.PI / 180);
-            const x = Math.sin(itemAngle) * radius;
-            const z = Math.cos(itemAngle) * radius;
-            const scale = (z + radius) / (radius * 2) + 0.5;
-            
-            item.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${-itemAngle}rad) scale(${scale})`;
-            item.style.opacity = Math.max(0.4, Math.min(1, scale));
-            item.style.zIndex = Math.floor(z + radius);
+    // Append all slides at once for better performance
+    track.appendChild(fragment);
+
+    // Initialize Swiper if available
+    if (typeof Swiper !== 'undefined') {
+        new Swiper('.mySwiper', {
+            slidesPerView: 'auto',
+            spaceBetween: 20,
+            grabCursor: true,
+            freeMode: true,
+            keyboard: {
+                enabled: true,
+            },
         });
+    } else {
+        console.warn('Swiper library not loaded. Carousel will not function correctly.');
     }
-    
-    // Mouse/Touch events
-    function startDrag(e) {
-        e.preventDefault();
-        const pos = e.type === 'touchstart' ? e.touches[0] : e;
-        dragging = true;
-        startX = pos.clientX;
-        startAngle = angle;
-        carousel.style.cursor = 'grabbing';
-    }
-    
-    function onDrag(e) {
-        if (!dragging) return;
-        e.preventDefault();
-        const pos = e.type === 'touchmove' ? e.touches[0] : e;
-        const delta = (pos.clientX - startX) * 0.3;
-        angle = startAngle + delta;
-        updatePositions();
-    }
-    
-    function stopDrag() {
-        dragging = false;
-        carousel.style.cursor = 'grab';
-    }
-    
-    // Events
-    if (carousel) {
-        carousel.addEventListener('mousedown', startDrag);
-        carousel.addEventListener('touchstart', startDrag, { passive: false });
-    }
-    
-    window.addEventListener('mousemove', onDrag);
-    window.addEventListener('touchmove', onDrag, { passive: false });
-    window.addEventListener('mouseup', stopDrag);
-    window.addEventListener('touchend', stopDrag);
-    
-    // Add keyboard controls (optional)
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') {
-            dir = -1;
-            spinning = true;
-        } else if (e.key === 'ArrowRight') {
-            dir = 1;
-            spinning = true;
-        } else if (e.key === ' ') {
-            spinning = !spinning;
-            e.preventDefault();
-        }
-    });
-    
-    // Animation
-    function animate() {
-        if (spinning && !dragging) {
-            angle += dir * (speed * 0.1);
-            updatePositions();
-        }
-        requestAnimationFrame(animate);
-    }
-    
-    // Initialize
-    if (total > 0) {
-        updatePositions();
-        animate();
-    }
-})();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCarousel);
+} else {
+    initCarousel();
+}
