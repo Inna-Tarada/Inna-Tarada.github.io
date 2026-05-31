@@ -1,0 +1,42 @@
+
+#bioSection {
+    grid-column: 2 / 22;
+
+}
+
+#bioSection img {
+    float: left; 
+    max-width: 100%; 
+    margin-right: 25px; 
+    margin-bottom: 15px; 
+    margin-top: 5px; 
+    
+    border-radius: 12px; 
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    object-fit: cover; /* Гарантирует, что пропорции фото не исказятся */
+}
+
+#Portrait {
+    width: 670px;
+}
+
+#Th1 {
+    width: 450px;
+}
+
+#veterPeremen {
+    width: 450px;
+}
+
+@media (max-width: 768px) {
+    #bioSection img {
+        float: none; 
+        display: block; 
+        margin: 0 auto 20px auto; 
+        width: 80%; 
+    }
+    #bioSection {
+        grid-column: 1; 
+    }
+}
