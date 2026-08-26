@@ -1,43 +1,383 @@
+﻿/* ==========================================================================
+   Certificates gallery. The legacy filename is kept because it is already
+   referenced by index.html; the former 3D carousel has been removed.
+   ========================================================================== */
 
-.carousel {
+.gallerySection {
+    grid-column: 2 / 22;
     width: 100%;
-    height: 50vh;
+    max-width: 1500px;
+    justify-self: center;
+}
+
+/* The certificate page uses the same centered header grid as every other page. */
+#certificates > header {
+    grid-column: 2 / 22;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1rem, 2.5vw, 2.5rem);
+    width: 100%;
+    max-width: 1500px;
+    justify-self: center;
+}
+
+.section-header__copy {
+    min-width: 0;
+}
+
+.back-to-menu {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.9rem;
+    padding: 0.65rem 1rem 0.65rem 0.8rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: rgba(100, 181, 246, 0.08);
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.back-to-menu:hover {
+    border-color: var(--accent-bright);
+    background: var(--accent-soft);
+    color: var(--accent-bright);
+    transform: translateY(-2px);
+}
+
+.back-to-menu svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.section-intro {
+    display: block;
+    margin-bottom: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1.25rem, 2.5vw, 2rem) 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.section-intro .section-eyebrow {
+    grid-column: 1 / -1;
+    margin-bottom: -0.25rem;
+}
+
+.section-intro h2 {
+    max-width: 28ch;
+    margin: 0;
+}
+
+.section-intro > p:last-child {
+    max-width: 48ch;
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 0.96rem;
+    line-height: 1.65;
+}
+
+/* A responsive masonry wall keeps each document's original proportions while
+   making better use of wide desktop screens than a fixed carousel did. */
+.certificate-wall {
+    columns: 5 205px;
+    column-gap: clamp(0.75rem, 1.35vw, 1.25rem);
+    padding: 0.15rem;
+}
+
+.certificate-card {
     position: relative;
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 clamp(0.75rem, 1.35vw, 1.25rem);
+    padding: 0;
     overflow: hidden;
-    cursor: grab;
+    break-inside: avoid;
+    border: 1px solid rgba(214, 231, 248, 0.16);
+    border-radius: 0.7rem;
+    background: #10151c;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.32);
+    color: var(--ink);
+    cursor: zoom-in;
+    text-align: left;
+    isolation: isolate;
+    transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
 }
 
-.carousel:active { 
-    cursor: grabbing; 
+.certificate-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent 62%, rgba(3, 6, 10, 0.76));
+    opacity: 0.5;
+    transition: opacity 220ms ease;
 }
 
-.track {
+.certificate-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #e8e8e5;
+    filter: saturate(0.88) contrast(1.025) brightness(0.97);
+    transition: filter 280ms ease, transform 350ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.certificate-card__label {
+    position: absolute;
+    right: 0.65rem;
+    bottom: 0.55rem;
+    z-index: 2;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.certificate-card:hover,
+.certificate-card:focus-visible {
+    z-index: 2;
+    border-color: var(--line-strong);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5), 0 0 24px rgba(100, 181, 246, 0.12);
+    transform: translateY(-4px);
+}
+
+.certificate-card:hover::after,
+.certificate-card:focus-visible::after {
+    opacity: 1;
+}
+
+.certificate-card:hover img,
+.certificate-card:focus-visible img {
+    filter: saturate(1) contrast(1) brightness(1);
+    transform: scale(1.018);
+}
+
+.certificate-card:hover .certificate-card__label,
+.certificate-card:focus-visible .certificate-card__label {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Lightbox is created by scripts/carousel.js to keep gallery markup readable. */
+.certificate-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: grid;
+    grid-template-columns: clamp(2.75rem, 6vw, 4.5rem) minmax(0, 1fr) clamp(2.75rem, 6vw, 4.5rem);
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: clamp(0.75rem, 2vw, 1.5rem);
+    background: rgba(2, 4, 7, 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 220ms ease, visibility 220ms ease;
+}
+
+.certificate-lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.certificate-lightbox__stage {
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    place-items: center;
     width: 100%;
     height: 100%;
-    position: relative;
-    transform-style: preserve-3d;
+    min-height: 0;
 }
 
-.item {
+.certificate-lightbox__image {
+    max-width: 100%;
+    max-height: calc(100vh - 7.5rem);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.35rem;
+    background: #f2f2ef;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.72);
+    object-fit: contain;
+    transform: scale(0.975);
+    transition: transform 240ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.certificate-lightbox.is-open .certificate-lightbox__image {
+    transform: scale(1);
+}
+
+.certificate-lightbox__button {
+    display: grid;
+    place-items: center;
+    width: clamp(2.6rem, 5vw, 3.6rem);
+    height: clamp(2.6rem, 5vw, 3.6rem);
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: rgba(12, 17, 24, 0.86);
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.certificate-lightbox__button:hover {
+    border-color: var(--line-strong);
+    background: var(--accent-soft);
+    color: var(--accent-bright);
+    transform: scale(1.05);
+}
+
+.certificate-lightbox__button svg {
+    width: 1.35rem;
+    height: 1.35rem;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+}
+
+.certificate-lightbox__prev {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+}
+
+.certificate-lightbox__next {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: center;
+}
+
+.certificate-lightbox__close {
     position: absolute;
-    width: 280px;
-    height: 280px;
-    left: 50%;
-    top: 20%;
-    margin-left: -140px;
-    margin-top: -20px;
-    border-radius: 20px;
-    overflow: hidden;
-    backface-visibility: visible;
+    top: clamp(0.75rem, 2vw, 1.5rem);
+    right: clamp(0.75rem, 2vw, 1.5rem);
+    z-index: 2;
 }
 
-.item img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-    pointer-events: none;
+.certificate-lightbox__meta {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    max-width: 52rem;
+    justify-self: center;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: uppercase;
 }
 
-.carouselSection {
-    grid-column: 2 / 22;
+@media (max-width: 1100px) {
+    .certificate-wall {
+        columns: 4 190px;
+    }
+}
+
+@media (max-width: 900px) {
+    #certificates > header {
+        grid-column: 1;
+    }
+
+    .gallerySection {
+        grid-column: 1;
+        max-width: none;
+    }
+
+    .section-intro {
+        display: block;
+    }
+
+    .section-intro .section-eyebrow {
+        grid-column: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    #certificates > header {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .back-to-menu {
+        min-height: 2.6rem;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.68rem;
+    }
+
+    .back-to-menu span {
+        display: none;
+    }
+
+    .certificate-wall {
+        columns: 2 130px;
+        column-gap: 0.5rem;
+    }
+
+    .certificate-card {
+        margin-bottom: 0.5rem;
+        border-radius: 0.3rem;
+    }
+
+    .certificate-card__label {
+        display: none;
+    }
+
+    .certificate-lightbox {
+        grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+        grid-template-rows: minmax(0, 1fr) auto;
+        gap: 0.35rem;
+        padding: 3.9rem 0.5rem 0.8rem;
+    }
+
+    .certificate-lightbox__image {
+        max-height: calc(100vh - 8.5rem);
+    }
+
+    .certificate-lightbox__button {
+        width: 2.55rem;
+        height: 2.55rem;
+    }
+
+    .certificate-lightbox__meta {
+        padding: 0 0.3rem;
+        font-size: 0.66rem;
+    }
+}
+
+@media (max-width: 380px) {
+    #certificates > header {
+        display: grid;
+    }
+
+    .back-to-menu {
+        margin-top: 0;
+    }
+
+    .certificate-wall {
+        columns: 1;
+    }
 }

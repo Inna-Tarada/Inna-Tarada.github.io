@@ -661,11 +661,15 @@ async function loadMultipleModels() {
 }
 
 // ========================= Объявление кнопочек =========================
+function returnToMenu() {
+    cameraController.toDefaultView();
+    HTMLRemove();
+}
+
 function setupButtons() {
     buttonManager.addButton(Building, () => {
         console.log('Building selected!');
-        cameraController.toDefaultView();
-        HTMLRemove();
+        returnToMenu();
     });
 
     buttonManager.addButton(PhotoFrame1, () => {
@@ -868,6 +872,7 @@ window.optimizationSystems = {
 
 window.FloatingAnimation = floatingAnimation;
 
+document.addEventListener('return-to-menu', returnToMenu);
 window.addEventListener('click', (event) => buttonManager.onClick(event), false);
 
 //

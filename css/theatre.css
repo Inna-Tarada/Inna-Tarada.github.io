@@ -1,82 +1,139 @@
+﻿/* ==========================================================================
+   Theatre and tutoring: long-form editorial content with poster-led rhythm.
+   ========================================================================== */
 
-#theatreSection, #tutoringSection {
+#theatreSection,
+#tutoringSection {
     grid-column: 2 / 22;
+    max-width: 1500px;
+}
+
+.theatre-float-right,
+.theatre-float-left {
+    width: min(42%, 450px);
+    margin-top: 0.35rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 52px rgba(0, 0, 0, 0.42);
+    object-fit: cover;
+    filter: saturate(0.88) contrast(1.04);
 }
 
 .theatre-float-right {
     float: right;
-    width: 450px;
-    margin-left: 30px;
-    margin-bottom: 20px;
-    margin-top: 5px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    object-fit: cover;
+    margin-left: clamp(1.25rem, 3vw, 2.35rem);
 }
 
 .theatre-float-left {
     float: left;
-    width: 450px;
-    margin-right: 30px;
-    margin-bottom: 20px;
-    margin-top: 5px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    object-fit: cover;
+    margin-right: clamp(1.25rem, 3vw, 2.35rem);
+}
+
+/* Monologue posters read as a compact archive rather than isolated cards. */
+#theatreSection > ul:first-of-type {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 2.5rem !important;
+}
+
+#theatreSection > ul:first-of-type > li {
+    margin: 0 !important;
+    padding: 1.1rem !important;
+    border: 1px solid var(--line) !important;
+    border-left: 3px solid var(--accent) !important;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.025);
+}
+
+#theatreSection > ul:first-of-type strong {
+    color: var(--accent-bright) !important;
+    font-family: Georgia, "Times New Roman", serif !important;
+    font-size: 1.15rem !important;
+    font-weight: 500;
 }
 
 .mono-poster {
     display: block;
-    margin-top: 15px;
     width: 100%;
-    max-width: 350px;
-    border-radius: 8px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
-    filter: brightness(0.95) contrast(1.05);
+    max-width: none;
+    margin-top: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 0.45rem;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+    filter: brightness(0.92) saturate(0.84) contrast(1.06);
+    transition: border-color 250ms ease, filter 250ms ease, transform 250ms ease;
 }
 
 .mono-poster:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6), 0 0 12px var(--glow-color);
-    filter: brightness(1) contrast(1);
+    border-color: var(--line-strong);
+    filter: brightness(1) saturate(1) contrast(1.02);
+    transform: translateY(-3px);
 }
 
-/* Интерактивность списка */
+#theatreSection ul.roles-list {
+    margin-top: 0.75rem;
+}
+
 #theatreSection ul.roles-list li {
-    margin-bottom: 0.6rem;
-    transition: transform 0.2s ease, color 0.2s ease;
+    margin-bottom: 0.35rem;
+    padding: 0.35rem 0 0.35rem 0.25rem;
+    border-bottom: 1px solid rgba(214, 231, 248, 0.07);
+    transition: color 180ms ease, transform 180ms ease;
 }
 
 #theatreSection ul.roles-list li:hover {
-    transform: translateX(6px);
-    color: #4facfe;
+    color: var(--ink);
+    transform: translateX(5px);
 }
 
-/* Очистка обтекания */
+#tutoringSection > div[style*="background"] {
+    border: 1px solid var(--line) !important;
+    border-left: 3px solid var(--accent) !important;
+    border-radius: var(--radius-sm) !important;
+    background: rgba(100, 181, 246, 0.07) !important;
+    box-shadow: var(--shadow-soft);
+}
+
 .clearfix::after {
     content: "";
-    clear: both;
     display: table;
+    clear: both;
 }
 
-/* Адаптивность для мобильных устройств */
-@media (max-width: 768px) {
-    #theatreSection, #tutoringSection {
-        grid-column: 1; 
+@media (max-width: 900px) {
+    #theatreSection,
+    #tutoringSection {
+        grid-column: 1;
+        max-width: none;
     }
-    .theatre-float-right, .theatre-float-left {
+
+    .theatre-float-right,
+    .theatre-float-left {
         float: none;
         display: block;
-        margin: 0 auto 20px auto;
-        width: 80%;
+        width: 100%;
+        max-width: 38rem;
+        height: auto;
+        margin: 0 auto 1.5rem;
     }
 }
-@media (max-width: 480px) {
-    .theatre-float-right, .theatre-float-left {
-        width: 100%;
+
+@media (max-width: 700px) {
+    #theatreSection > ul:first-of-type {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .theatre-float-right,
+    .theatre-float-left {
+        max-width: 100%;
+        border-radius: 0.75rem;
+    }
+
+    #theatreSection > ul:first-of-type > li {
+        padding: 0.9rem !important;
     }
 }

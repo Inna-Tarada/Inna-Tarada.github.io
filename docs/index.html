@@ -3,53 +3,70 @@
     <head>
         <title>Инна Тарада</title>
         <meta charset="UTF-8">
-		<link rel="manifest" href="/assets/manifest-BmlUTub6.json">
+  <link rel="manifest" href="/assets/manifest-BmlUTub6.json">
         <link rel="icon" type="image/png" href="/assets/icon-192-Dpe9K9mI.png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <script type="module" crossorigin src="/assets/index-CYru7fdv.js"></script>
-      <link rel="stylesheet" crossorigin href="/assets/index-DovvE6NP.css">
+      <script type="module" crossorigin src="/assets/index-kiCCLMR0.js"></script>
+      <link rel="stylesheet" crossorigin href="/assets/index-Db-9ARmy.css">
     </head>
     <body>
         
         <canvas id="bg"></canvas>
 
         <main id="bio">
-            <header>
+            <header class="section-header">
                 <p class="header_text">Биография</p>
+                <button class="back-to-menu" type="button" data-return-to-menu aria-label="Вернуться в главное меню">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10.5V20h13v-9.5M9.5 20v-5h5v5" /></svg>
+                    <span>В меню</span>
+                </button>
             </header>
 
             <section id="bioSection">
-                <img id="Portrait" src="/assets/Portrait-BdbzZGE0.jpg">
-                <p style="margin-bottom: 1rem; line-height: 1.5;"><strong>Инна Борисовна Тарада</strong> — известная российская актриса театра и кино, родилась 1 сентября 1973 года в городе Бийске. Её творческий путь — это история огромной любви к искусству и людям. История, которая привела её из далекого алтайского города на подмостки Тульского академического театра драмы, ставшего для неё второй родиной.</p>
-                
-                <p style="margin-bottom: 1rem; line-height: 1.5;">Мечта о сцене привела Инну Борисовну в Ярославский государственный театральный институт, который она успешно окончила. А в 1995 году началась её яркая глава в Туле. Именно здесь, в Тульском академическом театре драмы, раскрылся её многогранный талант. Театральный дебют актрисы состоялся в спектакле «Волки и овцы» А.Н. Островского, где она блестяще исполнила роль Глафиры Алексеевны.</p>
-                
-                <p style="margin-bottom: 0.8rem; line-height: 1.5;">За тридцать лет служения сцене Инна Тарада воплотила десятки разнообразных образов — от комедийных до драматических. Её репертуар поражает своей широтой:</p>
-                <img id="Th1" src="/assets/Th1-BLx2hyGd.jpg">
-                <ul style="list-style-type: disc; padding-left: 2rem; margin-bottom: 1.2rem; line-height: 1.6;">
-                    <li>«ВАЛЬКИРИЯ - "КВАРТЕТ" Рональд Харвуд (2025)»</li>
-                    <li>«ЭММА ВИКТОРОВНА - "НОМЕР С ФРУКТАМИ" Александр Коровкин (2023)»</li>
-                    <li>«МАНЯ - "СОКРОВЕННАЯ ЛЮБОВЬ" Андрей Платонов (2022)»</li>
-                    <li>«МЭРИ СМИТ - "ПАПА В ПАУТИНЕ" Рэй Куни (2022)»</li>
-                    <li>«НАСТАСЬЯ ПЕТРОВНА ЗЯБЛОВА - "ДЯДЮШКИН СОН" Ф.М. Достоевский (2021)»</li>
-                    <li>«БЕЛИНА - "МНИМЫЙ БОЛЬНОЙ" Жан-Батист Мольер (2020)»</li>
-                    <li>«ВЛАДЫКИНА - "104 СТРАНИЦЫ ПРО ЛЮБОВЬ" Эдвард Радзинский (2020)»</li>
-                    <li>«ПЕПИТА - "АВАНТЮРИСТ (БЛЭЗ)" Клод Манье (2019)»</li>
-                    <li>«МАРИНА - "ЗЕМЛЯ ЭЛЬЗЫ" Ярослава Пулинович (2018)»</li>
-                    <li style="list-style-type: none; padding-top: 0.5rem; font-style: italic; opacity: 0.8;">...и многие другие.</li>
-                </ul>
-                <img id="veterPeremen" src="/assets/veterPeremen-B6exZ-Ca.jpg">
-                <p style="margin-bottom: 1rem; line-height: 1.5;">Особое место в творчестве актрисы занимают поэтические моноспектакли, посвящённые жизни и творчеству легендарных личностей: <strong>Высоцкого и Влади, Ахматовой и Гумилева, Цветаевой и Эфрона, Маяковского и Брик</strong>. В этих работах она выступает не только как исполнитель, но и как автор, глубоко исследуя и чувствуя судьбы великих людей.</p>
-                
-                <p style="line-height: 1.5;">За свои заслуги в 2022 году актриса была награждена Почётной грамотой Министерства культуры Тульской области. Сегодня Инна Борисовна стоит на службе в театре, радуя зрителей новыми ролями, также активно занимается общественной деятельностью: проводит творческие встречи, работает с молодёжью и студентами. В Туле живёт её семья — дочь Юлианна (студент исторического факультета МГУ имени Ломоносова) и мама, для которых актриса является надёжной опорой и вдохновителем.</p>
+                <div class="bio-row bio-row--lead">
+                    <img id="Portrait" src="/assets/Portrait-BdbzZGE0.jpg" alt="Портрет Инны Тарады">
+                    <div class="bio-copy">
+                        <p><strong>Инна Борисовна Тарада</strong> — известная российская актриса театра и кино, родилась 1 сентября 1973 года в городе Бийске. Её творческий путь — это история огромной любви к искусству и людям. История, которая привела её из далекого алтайского города на подмостки Тульского академического театра драмы, ставшего для неё второй родиной.</p>
+                        <p>Мечта о сцене привела Инну Борисовну в Ярославский государственный театральный институт, который она успешно окончила. А в 1995 году началась её яркая глава в Туле. Именно здесь, в Тульском академическом театре драмы, раскрылся её многогранный талант. Театральный дебют актрисы состоялся в спектакле «Волки и овцы» А.Н. Островского, где она блестяще исполнила роль Глафиры Алексеевны.</p>
+                        <p>За тридцать лет служения сцене Инна Тарада воплотила десятки разнообразных образов — от комедийных до драматических. Её репертуар поражает своей широтой:</p>
+                    </div>
+                </div>
+
+                <div class="bio-row bio-row--repertoire">
+                    <img id="Th1" src="/assets/Th1-BLx2hyGd.jpg" alt="Инна Тарада на театральной сцене">
+                    <ul>
+                        <li>«ВАЛЬКИРИЯ - "КВАРТЕТ" Рональд Харвуд (2025)»</li>
+                        <li>«ЭММА ВИКТОРОВНА - "НОМЕР С ФРУКТАМИ" Александр Коровкин (2023)»</li>
+                        <li>«МАНЯ - "СОКРОВЕННАЯ ЛЮБОВЬ" Андрей Платонов (2022)»</li>
+                        <li>«МЭРИ СМИТ - "ПАПА В ПАУТИНЕ" Рэй Куни (2022)»</li>
+                        <li>«НАСТАСЬЯ ПЕТРОВНА ЗЯБЛОВА - "ДЯДЮШКИН СОН" Ф.М. Достоевский (2021)»</li>
+                        <li>«БЕЛИНА - "МНИМЫЙ БОЛЬНОЙ" Жан-Батист Мольер (2020)»</li>
+                        <li>«ВЛАДЫКИНА - "104 СТРАНИЦЫ ПРО ЛЮБОВЬ" Эдвард Радзинский (2020)»</li>
+                        <li>«ПЕПИТА - "АВАНТЮРИСТ (БЛЭЗ)" Клод Манье (2019)»</li>
+                        <li>«МАРИНА - "ЗЕМЛЯ ЭЛЬЗЫ" Ярослава Пулинович (2018)»</li>
+                        <li class="bio-list-more">...и многие другие.</li>
+                    </ul>
+                </div>
+
+                <div class="bio-row">
+                    <img id="veterPeremen" src="/assets/veterPeremen-B6exZ-Ca.jpg" alt="Инна Тарада в спектакле «Ветер перемен»">
+                    <div class="bio-copy">
+                        <p>Особое место в творчестве актрисы занимают поэтические моноспектакли, посвящённые жизни и творчеству легендарных личностей: <strong>Высоцкого и Влади, Ахматовой и Гумилева, Цветаевой и Эфрона, Маяковского и Брик</strong>. В этих работах она выступает не только как исполнитель, но и как автор, глубоко исследуя и чувствуя судьбы великих людей.</p>
+                        <p>За свои заслуги в 2022 году актриса была награждена Почётной грамотой Министерства культуры Тульской области. Сегодня Инна Борисовна стоит на службе в театре, радуя зрителей новыми ролями, также активно занимается общественной деятельностью: проводит творческие встречи, работает с молодёжью и студентами. В Туле живёт её семья — дочь Юлианна (студент исторического факультета МГУ имени Ломоносова) и мама, для которых актриса является надёжной опорой и вдохновителем.</p>
+                    </div>
+                </div>
             </section>
         </main>
 
         <main id="filmography">
-            <header>
+            <header class="section-header">
                 <p class="header_text">Фильмография</p>
+                <button class="back-to-menu" type="button" data-return-to-menu aria-label="Вернуться в главное меню">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10.5V20h13v-9.5M9.5 20v-5h5v5" /></svg>
+                    <span>В меню</span>
+                </button>
             </header>
-            <section>
+            <section class="filmography-copy">
                 <h2>Роли в кино</h2>
                 <ul class="film-list">
                     <li><strong>2023</strong> — Лихорадка — сестра Иванова</li>
@@ -79,19 +96,147 @@
         </main>
 
         <main id="certificates">
-            <header>
-                <p class="header_text">Сертификаты (данная часть сайта в процессе допиливания)</p>
+            <header class="section-header">
+                <p class="header_text">Грамоты</p>
+                <button class="back-to-menu" type="button" data-return-to-menu aria-label="Вернуться в главное меню">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10.5V20h13v-9.5M9.5 20v-5h5v5" /></svg>
+                    <span>В меню</span>
+                </button>
             </header>
-            <section class="carouselSection">
-                <div class="carousel" id="carousel">
-                    <div class="track" id="track"></div>
+            <section class="gallerySection">
+                <div class="section-intro">
+                    <h2>Документы, которые остаются за кулисами</h2>
+                </div>
+
+                <!-- Карточки остаются обычными кнопками: ими удобно пользоваться мышью, клавиатурой и экранным диктором. -->
+                <div class="certificate-wall" data-certificate-gallery aria-label="Галерея сертификатов">
+                    <button class="certificate-card certificate-card--feature" type="button" data-certificate aria-label="Открыть сертификат 01">
+                        <img src="/assets/3x5Pz_dSC3-cOjGF1sOk4WeUOA2_7gSbBOgHqYXE-V0-BKoUdDM9uKGB0OjTajFadmfcSJasB-Umck8uqe_QNSeq-D7Z1Gc1i.jpg" alt="Сертификат 01" loading="eager">
+                        <span class="certificate-card__label">01 / архив</span>
+                    </button>
+                    <button class="certificate-card certificate-card--feature" type="button" data-certificate aria-label="Открыть сертификат 02">
+                        <img src="/assets/nwFYfgI_zEApyO3LCWqaCIjC-ZztGcHiEDtmIM5Ui9v-YNMK-MPU7zVmCw51l6xILmg8QRFjyJUcKNrngUqvZAm2-DMy13UQO.jpg" alt="Сертификат 02" loading="eager">
+                        <span class="certificate-card__label">02 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 03">
+                        <img src="/assets/UJumEUPtnqMcn3sGJX_GdhFO8fXhSkvGbusWfWpDYtliP0upiTvwPMNIlp0CvhelPBx7JMu5AyBGfQ2TE_s0HeQn-EPCI5vFK.jpg" alt="Сертификат 03" loading="lazy">
+                        <span class="certificate-card__label">03 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 04">
+                        <img src="/assets/uKMI-1L42aL_7XRjkjDCEE7DjBuZydrHVbHCFLaZzuy4bNNhxx8xyhObi024lam31y_Y0zS9S495pmwHIVP-n062-D1Ip3j6u.jpg" alt="Сертификат 04" loading="lazy">
+                        <span class="certificate-card__label">04 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 05">
+                        <img src="/assets/photo_1_2026-08-26_14-20-26-v8A2LVPG.jpg" alt="Сертификат 05" loading="lazy">
+                        <span class="certificate-card__label">05 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 06">
+                        <img src="/assets/photo_2_2026-08-26_14-20-26-CYVSxXej.jpg" alt="Сертификат 06" loading="lazy">
+                        <span class="certificate-card__label">06 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 07">
+                        <img src="/assets/photo_3_2026-08-26_14-20-26-DapV2EG2.jpg" alt="Сертификат 07" loading="lazy">
+                        <span class="certificate-card__label">07 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 08">
+                        <img src="/assets/photo_4_2026-08-26_14-20-26-BehqUO72.jpg" alt="Сертификат 08" loading="lazy">
+                        <span class="certificate-card__label">08 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 09">
+                        <img src="/assets/photo_5_2026-08-26_14-20-26-DAQGhF8Y.jpg" alt="Сертификат 09" loading="lazy">
+                        <span class="certificate-card__label">09 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 10">
+                        <img src="/assets/photo_6_2026-08-26_14-20-26-B2QXZ4wS.jpg" alt="Сертификат 10" loading="lazy">
+                        <span class="certificate-card__label">10 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 11">
+                        <img src="/assets/photo_7_2026-08-26_14-20-26-DqNuI_nz.jpg" alt="Сертификат 11" loading="lazy">
+                        <span class="certificate-card__label">11 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 12">
+                        <img src="/assets/photo_8_2026-08-26_14-20-26-hd6zXSpM.jpg" alt="Сертификат 12" loading="lazy">
+                        <span class="certificate-card__label">12 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 13">
+                        <img src="/assets/photo_9_2026-08-26_14-20-26-DiqhsCC6.jpg" alt="Сертификат 13" loading="lazy">
+                        <span class="certificate-card__label">13 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 14">
+                        <img src="/assets/photo_10_2026-08-26_14-20-26-jn3JKKCP.jpg" alt="Сертификат 14" loading="lazy">
+                        <span class="certificate-card__label">14 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 15">
+                        <img src="/assets/photo_11_2026-08-26_14-20-26-CF4OsJE2.jpg" alt="Сертификат 15" loading="lazy">
+                        <span class="certificate-card__label">15 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 16">
+                        <img src="/assets/photo_12_2026-08-26_14-20-26-CLYk976U.jpg" alt="Сертификат 16" loading="lazy">
+                        <span class="certificate-card__label">16 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 17">
+                        <img src="/assets/photo_13_2026-08-26_14-20-26-DaL56F5r.jpg" alt="Сертификат 17" loading="lazy">
+                        <span class="certificate-card__label">17 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 18">
+                        <img src="/assets/photo_14_2026-08-26_14-20-26-Dx9cBAvD.jpg" alt="Сертификат 18" loading="lazy">
+                        <span class="certificate-card__label">18 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 19">
+                        <img src="/assets/photo_15_2026-08-26_14-20-26-vtaumGmE.jpg" alt="Сертификат 19" loading="lazy">
+                        <span class="certificate-card__label">19 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 20">
+                        <img src="/assets/photo_16_2026-08-26_14-20-26-CGV_qF0J.jpg" alt="Сертификат 20" loading="lazy">
+                        <span class="certificate-card__label">20 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 21">
+                        <img src="/assets/photo_17_2026-08-26_14-20-26-DE8IoG74.jpg" alt="Сертификат 21" loading="lazy">
+                        <span class="certificate-card__label">21 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 22">
+                        <img src="/assets/photo_18_2026-08-26_14-20-26-Bd0D9xlG.jpg" alt="Сертификат 22" loading="lazy">
+                        <span class="certificate-card__label">22 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 23">
+                        <img src="/assets/photo_19_2026-08-26_14-20-26-DKrQwrKS.jpg" alt="Сертификат 23" loading="lazy">
+                        <span class="certificate-card__label">23 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 24">
+                        <img src="/assets/photo_20_2026-08-26_14-20-26-11pAwdVW.jpg" alt="Сертификат 24" loading="lazy">
+                        <span class="certificate-card__label">24 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 25">
+                        <img src="/assets/photo_21_2026-08-26_14-20-26-CzUpAjs-.jpg" alt="Сертификат 25" loading="lazy">
+                        <span class="certificate-card__label">25 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 26">
+                        <img src="/assets/photo_22_2026-08-26_14-20-26-YhtsJkRm.jpg" alt="Сертификат 26" loading="lazy">
+                        <span class="certificate-card__label">26 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 27">
+                        <img src="/assets/photo_23_2026-08-26_14-20-26-CIelBvdV.jpg" alt="Сертификат 27" loading="lazy">
+                        <span class="certificate-card__label">27 / архив</span>
+                    </button>
+                    <button class="certificate-card" type="button" data-certificate aria-label="Открыть сертификат 28">
+                        <img src="/assets/photo_24_2026-08-26_14-20-26-DHyRxM_Y.jpg" alt="Сертификат 28" loading="lazy">
+                        <span class="certificate-card__label">28 / архив</span>
+                    </button>
+                    <button class="certificate-card certificate-card--wide" type="button" data-certificate aria-label="Открыть сертификат 29">
+                        <img src="/assets/photo_25_2026-08-26_14-20-26-DopNGOWI.jpg" alt="Сертификат 29" loading="lazy">
+                        <span class="certificate-card__label">29 / архив</span>
+                    </button>
                 </div>
             </section>
         </main>
 
         <main id="theatre">
-            <header>
+            <header class="section-header">
                 <p class="header_text">Сцена и жизнь</p>
+                <button class="back-to-menu" type="button" data-return-to-menu aria-label="Вернуться в главное меню">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10.5V20h13v-9.5M9.5 20v-5h5v5" /></svg>
+                    <span>В меню</span>
+                </button>
             </header>
 
             <section id="theatreSection" class="clearfix">
@@ -181,8 +326,12 @@
         </main>
 
         <main id="tutoring">
-            <header>
+            <header class="section-header">
                 <p class="header_text">Репетиторство</p>
+                <button class="back-to-menu" type="button" data-return-to-menu aria-label="Вернуться в главное меню">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10.5V20h13v-9.5M9.5 20v-5h5v5" /></svg>
+                    <span>В меню</span>
+                </button>
             </header>
             <section id="tutoringSection" class="clearfix">
                 <img src="/assets/InnaWithKid-CXPfxLTG.jpg" alt="" class="theatre-float-right">
@@ -279,7 +428,7 @@
                             <div style="width: 32px; height: 32px; background: #3593ff; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; font-family: serif;">i</div>
                             <div>
                                 <p style="font-weight: bold;">Добро пожаловать!</p>
-                                <p style="margin-top: 5px;">Для возращения к выбору страниц нажмите на дорическое здание (можно нажать сквозь содержимое страницы). Приятного просмотра.</p>
+                                <p style="margin-top: 5px;">Всем любви, позитива и приятного просмотра.</p>
                                 <p style="margin-top: 1px;">Сайт сделан Владиславом "GuyBeneathTheVie" Кузякиным.</p>
                             </div>
                         </div>
@@ -290,6 +439,6 @@
                 </div>
             </div>
         </div>
-        <script src="./scripts/xp-popup.js"></script>
+        <!-- xp-popup.js и carousel.js импортируются из main_s_v2.js; повторный запуск не нужен. -->
     </body>
 </html>

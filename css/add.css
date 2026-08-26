@@ -1,42 +1,115 @@
+﻿/* ==========================================================================
+   Biography: structured editorial rows with a predictable responsive flow.
+   ========================================================================== */
 
 #bioSection {
     grid-column: 2 / 22;
+    max-width: 1500px;
+}
 
+.bio-row {
+    display: grid;
+    grid-template-columns: minmax(13rem, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(1.25rem, 3vw, 3rem);
+    align-items: start;
+    padding: 0 0 var(--space-5);
+    margin-bottom: var(--space-5);
+    border-bottom: 1px solid rgba(214, 231, 248, 0.1);
+}
+
+.bio-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.bio-row--repertoire {
+    grid-template-columns: minmax(12rem, 0.65fr) minmax(0, 1.35fr);
 }
 
 #bioSection img {
-    float: left; 
-    max-width: 100%; 
-    margin-right: 25px; 
-    margin-bottom: 15px; 
-    margin-top: 5px; 
-    
-    border-radius: 12px; 
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); 
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    object-fit: cover; /* Гарантирует, что пропорции фото не исказятся */
+    width: 100%;
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 52px rgba(0, 0, 0, 0.42);
+    object-fit: cover;
+    filter: saturate(0.88) contrast(1.04);
+    transition: border-color 250ms ease, filter 250ms ease, transform 250ms ease;
+}
+
+#bioSection img:hover {
+    border-color: var(--line-strong);
+    filter: saturate(1) contrast(1.02);
+    transform: translateY(-3px);
 }
 
 #Portrait {
-    width: 670px;
+    aspect-ratio: 4 / 5;
+    object-position: center top;
 }
 
-#Th1 {
-    width: 450px;
-}
-
+#Th1,
 #veterPeremen {
-    width: 450px;
+    object-position: center;
 }
 
-@media (max-width: 768px) {
-    #bioSection img {
-        float: none; 
-        display: block; 
-        margin: 0 auto 20px auto; 
-        width: 80%; 
-    }
+.bio-copy {
+    min-width: 0;
+}
+
+.bio-copy p + p {
+    margin-top: var(--space-3);
+}
+
+#bioSection ul {
+    min-width: 0;
+    margin: 0;
+    padding: 0 0 0 1.35rem;
+}
+
+#bioSection li {
+    margin-bottom: 0.35rem;
+    padding-left: 0.3rem;
+}
+
+#bioSection .bio-list-more {
+    padding-top: 0.5rem;
+    list-style: none;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+@media (max-width: 900px) {
     #bioSection {
-        grid-column: 1; 
+        grid-column: 1;
+        max-width: none;
+    }
+
+    .bio-row,
+    .bio-row--repertoire {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.25rem;
+    }
+
+    #bioSection img {
+        width: 100%;
+        max-width: 38rem;
+        margin: 0 auto;
+    }
+
+    #Portrait {
+        aspect-ratio: 4 / 5;
+    }
+}
+
+@media (max-width: 600px) {
+    #bioSection img {
+        max-width: 100%;
+        border-radius: 0.75rem;
+    }
+
+    #bioSection ul {
+        padding-left: 1.15rem;
     }
 }
