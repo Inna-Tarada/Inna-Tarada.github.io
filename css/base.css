@@ -358,11 +358,21 @@ a:focus-visible {
 
     main > header,
     main > section,
-    #filmography section,
     #filmographyPhotos {
         grid-column: 1;
         width: 100%;
         max-width: none;
+    }
+
+    #filmography > .filmography-copy {
+        grid-column: 1;
+        width: 100%;
+        max-width: none;
+        order: 1;
+    }
+
+    #filmographyPhotos {
+        order: 2;
     }
 
     main > header {
